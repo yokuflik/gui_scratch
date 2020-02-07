@@ -1,0 +1,11 @@
+D:\Yoel\C#\GuiScratch\GuiScratch\bin\Debug\GuiScratch.exe.config
+D:\Yoel\C#\GuiScratch\GuiScratch\bin\Debug\GuiScratch.exe
+D:\Yoel\C#\GuiScratch\GuiScratch\bin\Debug\GuiScratch.pdb
+D:\Yoel\C#\GuiScratch\GuiScratch\obj\Debug\GuiScratch.csprojAssemblyReference.cache
+D:\Yoel\C#\GuiScratch\GuiScratch\obj\Debug\GuiScratch.Form1.resources
+D:\Yoel\C#\GuiScratch\GuiScratch\obj\Debug\GuiScratch.Properties.Resources.resources
+D:\Yoel\C#\GuiScratch\GuiScratch\obj\Debug\GuiScratch.csproj.GenerateResource.cache
+D:\Yoel\C#\GuiScratch\GuiScratch\obj\Debug\GuiScratch.csproj.CoreCompileInputs.cache
+D:\Yoel\C#\GuiScratch\GuiScratch\obj\Debug\GuiScratch.exe
+D:\Yoel\C#\GuiScratch\GuiScratch\obj\Debug\GuiScratch.pdb
+D:\Yoel\C#\GuiScratch\GuiScratch\obj\Debug\GuiScratch.AddEventFuncForm.resources
