@@ -7,14 +7,14 @@ namespace GuiScratch
 {
     public class ContainBlock : Block
     {
-        public ContainBlock(Control container, Point location, List<BlockInfo> blockInfos, Func<Block, bool, bool, bool> checkClientsAndParents, Action<Block> blockRightClick, decimal blockIndex, bool canBeParent = true)
+        public ContainBlock(Control container, Point location, List<BlockInfo> blockInfos, Func<Block, bool, bool, bool> checkClientsAndParents, Action<Block> blockRightClick, Action<Block, bool> blockStartMoving, decimal blockIndex, bool canBeParent = true)
         {
             Kind = BlockKinds.Contain;
             regularBlockSize = 32;
             parentBlockSize = 27;
 
             infos = blockInfos;
-            setBlock(container, infos[0], checkClientsAndParents, blockRightClick, blockIndex);
+            setBlock(container, infos[0], checkClientsAndParents, blockRightClick,blockStartMoving, blockIndex);
 
             //create the bmps
             /*Bmp = BlocksImageCreator.drawBitmap(BlockKinds.Action, Info, topPB, 32,Info.CanBeParent, 15,27);
@@ -32,7 +32,7 @@ namespace GuiScratch
             for (int  i=0;i<= topPBs.Count - 1; i++)
             {
                 topPBs[i].Parent = null;
-                centerPB[i].Parent = null;
+                centerPBs[i].Parent = null;
             }
 
             bottomPB.Parent = null;
@@ -40,6 +40,8 @@ namespace GuiScratch
 
         public override void AddMouseMoveAndDownFuncsToPB(MouseEventHandler mouseDownFunc, MouseEventHandler mouseMoveFunc)
         {
+            startMovingPB();
+
             topPBs[0].MouseDown += mouseDownFunc;
             topPBs[0].MouseMove += mouseMoveFunc;
         }
@@ -111,7 +113,7 @@ namespace GuiScratch
 
         public override Block Clone(decimal newIndex)
         {
-            return new ContainBlock(Container, topPBs[0].Location, getInfosListClone(), CheckClientsAndParents, BlockRightClick, newIndex, Info.CanBeParent);
+            return new ContainBlock(Container, topPBs[0].Location, getInfosListClone(), CheckClientsAndParents, BlockRightClick, BlockMoveFunc, newIndex, Info.CanBeParent);
         }
 
         private List<BlockInfo> getInfosListClone()
@@ -132,7 +134,7 @@ namespace GuiScratch
         {
             topPBs = new List<PictureBox>();
             topBitmaps = new List<Bitmap>();
-            centerPB = new List<PictureBox>();
+            centerPBs = new List<PictureBox>();
 
             insideClients = new List<Block>();
 
@@ -140,7 +142,7 @@ namespace GuiScratch
             {
                 topPBs.Add(new PictureBox());
                 topBitmaps.Add(null);
-                centerPB.Add(new PictureBox());
+                centerPBs.Add(new PictureBox());
 
                 insideClients.Add(null);
             }
@@ -217,23 +219,23 @@ namespace GuiScratch
                 topPBs[i].Image = topBitmaps[i];
                 topPBs[i].BackColor = Container.BackColor;
                 topPBs[i].MouseDown += PB_MouseDown;
-                topPBs[i].MouseMove += MouseMove;
-                topPBs[i].MouseUp += MouseUp;
+                topPBs[i].MouseMove += PB_MouseMove;
+                topPBs[i].MouseUp += PB_MouseUp;
 
                 Container.Controls.Add(topPBs[i]);
             }
             
             //set the center pbs
-            for (int i = 0; i <= centerPB.Count - 1; i++)
+            for (int i = 0; i <= centerPBs.Count - 1; i++)
             {
-                centerPB[i] = new PictureBox();
-                centerPB[i].Size = new Size(12, 20);
-                centerPB[i].BackColor = infos[i].BackColor;
-                centerPB[i].MouseDown += PB_MouseDown;
-                centerPB[i].MouseMove += MouseMove;
-                centerPB[i].MouseUp += MouseUp;
+                centerPBs[i] = new PictureBox();
+                centerPBs[i].Size = new Size(12, 20);
+                centerPBs[i].BackColor = infos[i].BackColor;
+                centerPBs[i].MouseDown += PB_MouseDown;
+                centerPBs[i].MouseMove += PB_MouseMove;
+                centerPBs[i].MouseUp += PB_MouseUp;
 
-                Container.Controls.Add(centerPB[i]);
+                Container.Controls.Add(centerPBs[i]);
             }
 
             //pb is the bottom of the if statement
@@ -242,8 +244,8 @@ namespace GuiScratch
             bottomPB.Image = bottomBmp;
             bottomPB.BackColor = Container.BackColor;
             bottomPB.MouseDown += PB_MouseDown;
-            bottomPB.MouseMove += MouseMove;
-            bottomPB.MouseUp += MouseUp;
+            bottomPB.MouseMove += PB_MouseMove;
+            bottomPB.MouseUp += PB_MouseUp;
 
             Container.Controls.Add(bottomPB);
 
@@ -261,26 +263,81 @@ namespace GuiScratch
         #endregion
 
         #region move block
+
+        #region start moving
         
-        private void MouseMove(object sender, MouseEventArgs e)
+        public override void drawImageToBmp(ref Bitmap bmp, ref Point loc, ref Graphics g, bool drawClients = true)
+        {
+            int blockHeight = getBounds().Height;
+            
+            for (int i = 0; i <= topPBs.Count - 1; i++)
+            {
+                //topPB and info
+                drawPBToBmp(ref bmp, topPBs[i], loc);
+                infos[i].drawImageToBmp(ref bmp, ref loc, ref g);
+                loc.Y += topPBs[i].Height - 5;
+
+                //draw inside client
+                if (insideClients[i] != null)
+                {
+                    Point insideLoc = new Point(loc.X + centerPBs[i].Width, loc.Y+5);
+                    insideClients[i].drawImageToBmp(ref bmp, ref insideLoc, ref g);
+                }
+                
+                //draw the center
+                drawPBToBmp(ref bmp, centerPBs[i], loc);
+                loc.Y += centerPBs[i].Height;
+            }
+
+            //draw the bottom pb
+            drawPBToBmp(ref bmp, bottomPB, loc);
+
+            loc.Y += bottomPB.Height;
+            
+            //draw the client
+            if (isAParent() && drawClients)
+            {
+                Client.drawImageToBmp(ref bmp, ref loc, ref g);
+            }
+        }
+        
+        public override void setBlockVisible(bool visible)
+        {
+            for (int i = 0; i <= topPBs.Count - 1; i++)
+            {
+                topPBs[i].Visible = centerPBs[i].Visible = visible;
+                
+                if (insideClients[i] != null)
+                {
+                    insideClients[i].setBlockVisible(visible);
+                }
+            }
+
+            bottomPB.Visible = visible;
+        }
+
+        #endregion
+
+        /*private void MouseMove(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
                 setLocation(topPBs[0].Left + (e.X - lastPoint.X), topPBs[0].Top + (e.Y - lastPoint.Y));
             }
         }
+        */
 
-        private void MouseUp(object sender, MouseEventArgs e)
+        /*private void MouseUp(object sender, MouseEventArgs e)
         {
             CheckClientsAndParents(this, infos[0].CanBeParent, true);
-        }
+        }*/
 
         public override void bringToFront()
         {
             for (int i = 0; i <= topPBs.Count - 1; i++)
             {
                 topPBs[i].BringToFront();
-                centerPB[i].BringToFront();
+                centerPBs[i].BringToFront();
             }
 
             bottomPB.BringToFront();
@@ -299,25 +356,25 @@ namespace GuiScratch
         public override void setLocation(int x, int y)
         {
             topPBs[0].Location = new Point(x, y);
-            centerPB[0].Location = new Point(topPBs[0].Left, topPBs[0].Bottom - 5);
+            centerPBs[0].Location = new Point(topPBs[0].Left, topPBs[0].Bottom - 5);
             if (insideClients[0] != null)
             {
-                insideClients[0].setLocation(centerPB[0].Right, topPBs[0].Bottom);
+                insideClients[0].setLocation(centerPBs[0].Right, topPBs[0].Bottom);
             }
 
             //set the pbs and blocks location
             for (int i = 1; i <= topPBs.Count - 1; i++)
             {
-                topPBs[i].Location = new Point(centerPB[i - 1].Left, centerPB[i - 1].Bottom);
-                centerPB[i].Location = new Point(topPBs[i].Left, topPBs[i].Bottom - 5);
+                topPBs[i].Location = new Point(centerPBs[i - 1].Left, centerPBs[i - 1].Bottom);
+                centerPBs[i].Location = new Point(topPBs[i].Left, topPBs[i].Bottom - 5);
                 if (insideClients[i] != null)
                 {
-                    insideClients[i].setLocation(centerPB[i].Right, topPBs[i].Bottom);
+                    insideClients[i].setLocation(centerPBs[i].Right, topPBs[i].Bottom);
                 }
             }
 
             //set the bottom pb location
-            bottomPB.Location = new Point(centerPB[centerPB.Count - 1].Left, centerPB[centerPB.Count - 1].Bottom);
+            bottomPB.Location = new Point(centerPBs[centerPBs.Count - 1].Left, centerPBs[centerPBs.Count - 1].Bottom);
 
             //set the clients location
             if (Client != null)
@@ -379,9 +436,28 @@ namespace GuiScratch
             return topPBs[0].Left;
         }
 
-        public override Rectangle getBounds()
+        public override Rectangle getBounds(bool fullBounds = false)
         {
-            return new Rectangle(topPBs[0].Location, new Size(topPBs[0].Width, bottomPB.Bottom - topPBs[0].Top));
+            if (fullBounds)
+            {
+                Size size = getBounds().Size;
+
+                //add all the inside clients size
+                for (int i = 0; i <= insideClients.Count - 1; i++)
+                {
+                    Block curClient = insideClients[i];
+                    while (curClient != null)
+                    {
+                        size.Width = Math.Max(size.Width, curClient.getBounds(true).Width + centerPBs[0].Width);
+                        curClient = curClient.Client;
+                    }
+                }
+                return new Rectangle(topPBs[0].Location, size);
+            }
+            else
+            {
+                return new Rectangle(topPBs[0].Location, new Size(topPBs[0].Width, bottomPB.Bottom - topPBs[0].Top));
+            }
         }
 
         public override PictureBox getBottomPB()
@@ -477,7 +553,7 @@ namespace GuiScratch
                     }
                 }
 
-                centerPB[i].Height = height;
+                centerPBs[i].Height = height;
             }
 
             //set the location after the size setting
@@ -571,7 +647,7 @@ namespace GuiScratch
         public List<BlockInfo> infos;
 
         public List<PictureBox> topPBs;
-        public List<PictureBox> centerPB;
+        public List<PictureBox> centerPBs;
         public PictureBox bottomPB;
         
         List<Bitmap> topBitmaps;

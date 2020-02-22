@@ -10,14 +10,20 @@ using System.Windows.Forms;
 
 namespace GuiScratch
 {
-    public  class Run
+    public class Run
     {
-        public void runProgram(List<Block> blocks, Values myValues)
+        public void runProgram(List<Block> blocks, Values myValues, string folderPath)
         {
             this.blocks = blocks;
             this.myValues = myValues;
+            
+            string Output = folderPath;
+            if (folderPath != "")
+            {
+                Output += "\\";
+            }
+            Output += "Program.exe";
 
-            string Output = "Out.exe";
             string source = createProgramCode();
             Clipboard.SetText(source);
             CompilerResults results = buildExe(source, Output);
@@ -102,7 +108,7 @@ namespace FormWithButton
             parameters.ReferencedAssemblies.Add("System.Drawing.dll");
             parameters.ReferencedAssemblies.Add("System.Threading.dll");
             parameters.ReferencedAssemblies.Add("System.Runtime.InteropServices.dll");
-
+            
             CompilerResults results = icc.CompileAssemblyFromSource(parameters, source);
 
             return results;

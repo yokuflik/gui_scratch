@@ -12,9 +12,8 @@ namespace GuiScratch
             Kind = BlockKinds.OnStart;
             regularBlockSize = 50;
             parentBlockSize = 45;
-
-            BlockMoveFunc = blockStartMoving;
-            setBlock(container, blockInfo,checkClientsAndParents, rightMouseClick, blockIndex);
+            
+            setBlock(container, blockInfo,checkClientsAndParents, rightMouseClick,blockStartMoving, blockIndex);
             Info.CanBeClient = false;
             Info.drawHeight = 2;
             Info.Kind = Kind;

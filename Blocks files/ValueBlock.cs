@@ -10,11 +10,9 @@ namespace GuiScratch
         public ValueBlock(Control container, ValueKinds valueKind, Point location, BlockInfo blockInfo, Func<Block, bool, bool, bool> checkClientsAndParents, Action<Block> blockRightClick, Action<Block, bool> blockStartMoving, decimal blockIndex)
         {
             Kind = BlockKinds.Value;
-
-            BlockMoveFunc = blockStartMoving;
-
+            
             //create the bmp
-            setBlock(container, blockInfo, checkClientsAndParents, blockRightClick, blockIndex);
+            setBlock(container, blockInfo, checkClientsAndParents, blockRightClick,blockStartMoving, blockIndex);
             PB.BackColor = Color.Transparent;
             Info.drawHeight = 7;
             Info.ValueKind = valueKind;

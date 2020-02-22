@@ -255,7 +255,7 @@ namespace GuiScratch
                 {
                     if (BlockInfoEvents[i].CheckValueBlock(currentBlock))
                     {
-                        currentBlock.StartLikeClient(BlockInfoEvents[i].UpdateBlock, BlockInfoEvents[i].clientRemoved);
+                        //currentBlock.StartLikeClient(BlockInfoEvents[i].UpdateBlock, BlockInfoEvents[i].clientRemoved);
                         return true;
                     }
                 }

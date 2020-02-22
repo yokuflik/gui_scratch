@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace GuiScratch
@@ -9,7 +11,7 @@ namespace GuiScratch
     {
         #region start setup
 
-        public void setBlock(Control container, BlockInfo blockInfo, Func<Block, bool, bool, bool> checkClientsAndParents, Action<Block> blockRightClick, decimal blockIndex)
+        public void setBlock(Control container, BlockInfo blockInfo, Func<Block, bool, bool, bool> checkClientsAndParents, Action<Block> blockRightClick, Action<Block, bool> blockStartMoving, decimal blockIndex)
         {
             Container = container;
 
@@ -24,6 +26,8 @@ namespace GuiScratch
             CheckClientsAndParents = checkClientsAndParents;
 
             BlockRightClick = blockRightClick;
+
+            BlockMoveFunc = blockStartMoving;
         }
         
         public void setPB(Point location)
@@ -43,25 +47,13 @@ namespace GuiScratch
 
         public virtual Block Clone(decimal newIndex)
         {
-            //Block res = new Block(Container, Info, CheckClientsAndParents, BlockRightClick, BlockIndex);
+            //every kind of block returns the clone of his kind
             return null;
         }
 
         public virtual void remove()
         {
             PB.Parent = null;
-        }
-
-        public virtual void AddMouseMoveAndDownFuncsToPB(MouseEventHandler mouseDownFunc, MouseEventHandler mouseMoveFunc)
-        {
-            PB.MouseDown += mouseDownFunc;
-            PB.MouseMove += mouseMoveFunc;
-        }
-
-        public virtual void RemoveMouseMoveAndDownFuncsToPB(MouseEventHandler mouseDownFunc, MouseEventHandler mouseMoveFunc)
-        {
-            PB.MouseDown -= mouseDownFunc;
-            PB.MouseMove -= mouseMoveFunc;
         }
 
         public virtual string getCode()
@@ -75,9 +67,27 @@ namespace GuiScratch
             return res;
         }
 
+        #region move the block after duplicate
+
+        public virtual void AddMouseMoveAndDownFuncsToPB(MouseEventHandler mouseDownFunc, MouseEventHandler mouseMoveFunc)
+        {
+            startMovingPB();
+
+            movingPB.MouseDown += mouseDownFunc;
+            movingPB.MouseMove += mouseMoveFunc;
+        }
+
+        public virtual void RemoveMouseMoveAndDownFuncsToPB(MouseEventHandler mouseDownFunc, MouseEventHandler mouseMoveFunc)
+        {
+            movingPB.MouseDown -= mouseDownFunc;
+            movingPB.MouseMove -= mouseMoveFunc;
+        }
+
+        #endregion
+
         #region move block
         
-        PictureBox movingPB;
+        public PictureBox movingPB;
 
         #region start
 
@@ -106,7 +116,7 @@ namespace GuiScratch
             }
         }
 
-        private void startMovingPB()
+        public void startMovingPB()
         {
             if (BlockMoveFunc != null)
             {
@@ -121,10 +131,13 @@ namespace GuiScratch
             Graphics g = Graphics.FromImage(bmp);
             drawImageToBmp(ref bmp, ref loc, ref g);
 
+            //when the blocks are drawing to the bmp it draws also the background color so I need to make it transparent
+            bmp.MakeTransparent(Container.BackColor);
+
             //set the PB
             movingPB = new PictureBox();
-            movingPB.Size = bmpSize;
             movingPB.Location = getBounds().Location;
+            movingPB.Size = bmpSize;
             movingPB.Image = bmp;
             movingPB.BackColor = Color.Transparent;
             movingPB.MouseMove += PB_MouseMove;
@@ -135,15 +148,50 @@ namespace GuiScratch
             movingPB.BringToFront();
             movingPB.Select();
         }
-
-        public void setBlockVisible(bool visible)
+        
+        public virtual void setBlockVisible(bool visible)
         {
             PB.Visible = visible;
         }
 
+        #region draw to bitmap
+
+        public Rectangle setBlockRectangle(Point loc, Size size)
+        {
+            if (loc.X < 0)
+            {
+                size.Width += loc.X;
+                if (size.Width < 0)
+                {
+                    size.Width = 0;
+                }
+                loc.X = 0;
+            }
+            if (loc.Y < 0)
+            {
+                size.Height += loc.Y;
+                if (size.Height < 0)
+                {
+                    size.Height = 0;
+                }
+                loc.Y = 0;
+            }
+
+            return new Rectangle(loc, size);
+        }
+
+        public void drawPBToBmp(ref Bitmap bmp, PictureBox PB, Point loc)
+        {
+            Rectangle blockBounds = setBlockRectangle(loc, PB.Size);
+            if (blockBounds.Height > 0 && blockBounds.Width > 0)
+            {
+                PB.DrawToBitmap(bmp, blockBounds);
+            }
+        }
+
         public virtual void drawImageToBmp(ref Bitmap bmp, ref Point loc, ref Graphics g, bool drawClients = true)
         {
-            PB.DrawToBitmap(bmp, new Rectangle(loc, PB.Size));
+            drawPBToBmp(ref bmp, PB, loc);
 
             Info.drawImageToBmp(ref bmp, ref loc, ref g);
 
@@ -165,7 +213,7 @@ namespace GuiScratch
 
         public virtual void getImageSize(ref Size bmpSize)
         {
-            Rectangle b = getBounds();
+            Rectangle b = getBounds(true);
             bmpSize.Width = Math.Max(b.Width, bmpSize.Width);
             bmpSize.Height += b.Height;
 
@@ -174,6 +222,8 @@ namespace GuiScratch
                 Client.getImageSize(ref bmpSize);
             }
         }
+
+        #endregion
 
         public virtual void bringToFront()
         {
@@ -226,13 +276,13 @@ namespace GuiScratch
 
         #region set clients and parents after move
 
-        private void PB_MouseUp(object sender, MouseEventArgs e)
+        public void PB_MouseUp(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
             {
                 //set the blocks
                 setLocation(movingPB.Left, movingPB.Top);
-                
+
                 movingPB.Dispose();
 
                 //call the move block func
@@ -240,9 +290,6 @@ namespace GuiScratch
                 {
                     BlockMoveFunc(this, false);
                 }
-                
-                //show all the blocks
-                //setBlockVisible(true);
                 
                 //check if is a client or a parent
                 if (Client == null)
@@ -266,7 +313,7 @@ namespace GuiScratch
                 }
             }
         }
-
+        
         public Block getBottomBlock()
         {
             Block curBlock = this;
@@ -521,8 +568,8 @@ namespace GuiScratch
         {
             return PB.Left;
         }
-
-        public virtual Rectangle getBounds()
+        
+        public virtual Rectangle getBounds(bool fullBounds = false)
         {
             return PB.Bounds;
         }

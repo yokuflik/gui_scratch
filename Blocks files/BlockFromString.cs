@@ -68,7 +68,7 @@ namespace GuiScratch
                 case Block.BlockKinds.Value:
                     return new ValueBlock(container, Info.ValueKind, location, Info, checkClientsAndParents, rightClick,startMoving, BlockIndex);
                 case Block.BlockKinds.Contain:
-                    return new ContainBlock(container, location, infos, checkClientsAndParents, rightClick, BlockIndex, Info.CanBeParent);
+                    return new ContainBlock(container, location, infos, checkClientsAndParents, rightClick, startMoving, BlockIndex, Info.CanBeParent);
             }
 
             return null;

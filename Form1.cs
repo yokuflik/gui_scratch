@@ -94,6 +94,8 @@ namespace GuiScratch
 
         #region blocks
 
+        #region update blocks
+
         private void updateBlocksFunc()
         {
             //check in all the blocks list and search for the blocks that needs to update and update them
@@ -108,6 +110,10 @@ namespace GuiScratch
             //update the add blocks func
             bta.Rb_CheckedChanged(null, null);
         }
+
+        #endregion
+
+        #region add blocks
 
         public void addBlock(BlockInfo blockInfo, Point location)
         {
@@ -128,7 +134,7 @@ namespace GuiScratch
                     b = new ValueBlock(screenPB, blockInfo[0].ValueKind, location, blockInfo[0], setClientsAndParents, blockRightMouseClick,blockMove, blockIndex++);
                     break;
                 case Block.BlockKinds.Contain:
-                    b = new ContainBlock(screenPB, location, blockInfo, setClientsAndParents, blockRightMouseClick, blockIndex++, blockInfo[0].CanBeParent);
+                    b = new ContainBlock(screenPB, location, blockInfo, setClientsAndParents, blockRightMouseClick, blockMove, blockIndex++, blockInfo[0].CanBeParent);
                     break;
                 case Block.BlockKinds.OnStart:
                     b = new OnStartBlock(screenPB, location, blockInfo[0], setClientsAndParents, blockRightMouseClick,blockMove, blockIndex++);
@@ -143,6 +149,8 @@ namespace GuiScratch
 
             //updateBlocksFunc();
         }
+
+        #endregion
 
         #region dragAble
 
@@ -224,6 +232,59 @@ namespace GuiScratch
             }
         }
 
+        private List<decimal> getNotMovingBlockIndexes(Block b)
+        {
+            List<decimal> res = new List<decimal>();
+
+            //add all the blocks numbers
+            for (int i = 0; i <= blocks.Count - 1; i++)
+            {
+                res.Add(i);
+            }
+
+            //remove the moving blocks indexes from the list
+            if (b != null)
+            {
+                removeBlockAndHisClients(b, ref res);
+            }
+
+            return res;
+        }
+
+        private void removeBlockAndHisClients(Block b, ref List<decimal> res)
+        {
+            Block curB = b;
+            while (curB != null)
+            {
+                res.Remove(curB.BlockIndex);
+                checkInsideClients(ref res, curB);
+                curB = curB.Client;
+            }
+        }
+
+        private void checkInsideClients(ref List<decimal> res, Block curB)
+        {
+            if (curB.Kind == Block.BlockKinds.Contain)
+            {
+                ContainBlock cb = curB as ContainBlock;
+                for (int i =0;i<= cb.insideClients.Count - 1; i++)
+                {
+                    if (cb.insideClients[i] != null)
+                    {
+                        removeBlockAndHisClients(cb.insideClients[i], ref res);
+                    }
+                }
+            }
+        }
+
+        private void setBlocksVisibility(bool visible)
+        {
+            for (int i = 0; i <= blocks.Count - 1; i++)
+            {
+                blocks[i].setBlockVisible(visible);
+            }
+        }
+
         #region window rolling
 
         int space = 10;
@@ -232,7 +293,7 @@ namespace GuiScratch
             if (!setRollingPlusForTheSides(screen, lastMoved)) //the last move was in the size of the screen
             {
                 //check if needs to make the screen smaller
-                setRollingMinusForTheSides(screen, lastMoved, screen.Parent.Size);
+                setRollingMinusForTheSides(screen);
             }
         }
 
@@ -261,8 +322,9 @@ namespace GuiScratch
             return false; //because didn't change the size
         }
 
-        private void setRollingMinusForTheSides(Control screen, Control lastMoved, Size screenMinSize)
+        private void setRollingMinusForTheSides(Control screen)
         {
+            Size screenMinSize = screen.Parent.Size;
             Size maxSize = new Size();
 
             PictureBox curBottomBlock;
@@ -295,37 +357,10 @@ namespace GuiScratch
         }
 
         #endregion
-
-        private List<decimal> getNotMovingBlockIndexes(Block b)
-        {
-            List<decimal> res = new List<decimal>();
-
-            //add all the blocks numbers
-            for (int i = 0; i <= blocks.Count - 1; i++)
-            {
-                res.Add(i);
-            }
-
-            //remove the moving blocks indexes from the list
-            Block curB = b;
-            while(curB != null)
-            {
-                res.Remove(curB.BlockIndex);
-                curB = curB.Client;
-            }
-
-            return res;
-        }
-
-        private void setBlocksVisibility(bool visible)
-        {
-            for (int i = 0; i <= blocks.Count - 1; i++)
-            {
-                blocks[i].setBlockVisible(visible);
-            }
-        }
-
+        
         #endregion
+
+        #region clients and parents
 
         private bool setClientsAndParents(Block currentBlock, bool canBeParent, bool canBeClient)
         {
@@ -376,9 +411,11 @@ namespace GuiScratch
             }
             return false;
         }
-        
+
+        #endregion
+
         #region cms
-        
+
         private void setCmsToBlock()
         {
             ContextMenuStrip cms = new ContextMenuStrip();
@@ -437,6 +474,9 @@ namespace GuiScratch
 
             //remove block by block index
             removeBlockByBlockIndex(currentBlock.BlockIndex, true);
+
+            //set the window rolling
+            setRollingMinusForTheSides(screenPB);
         }
 
         private void removeBlockByBlockIndex(decimal blockIndex, bool removeClients = false)
@@ -531,15 +571,20 @@ namespace GuiScratch
         #region douplicate
         
         Block startBlock;
+        PictureBox startBlockMovingPB;
 
         private void DouplicateButton_Click(object sender, EventArgs e)
         {
             startBlock = douplicateBlockByBlockIndex(currentBlock.BlockIndex, true);
+            
+            startBlock.AddMouseMoveAndDownFuncsToPB(ScreenPanel_MouseDownAfterDouplicate, ScreenPanel_MouseMoveAfterDouplicate);
+            
+            startBlockMovingPB = startBlock.movingPB;
 
             //set the location
             ScreenPanel_MouseMoveAfterDouplicate(null, null);
             
-            startBlock.AddMouseMoveAndDownFuncsToPB(ScreenPanel_MouseDownAfterDouplicate, ScreenPanel_MouseMoveAfterDouplicate);
+            //add the mouse move func
             screenPB.MouseMove += ScreenPanel_MouseMoveAfterDouplicate;
         }
 
@@ -553,12 +598,9 @@ namespace GuiScratch
 
         private void ScreenPanel_MouseMoveAfterDouplicate(object sender, MouseEventArgs e)
         {
-            /*startBlock.setLocation(startBlock.PB.Left + (e.X - lastPoint.X), startBlock.PB.Top + (e.Y - lastPoint.Y));
-            lastPoint = e.Location;*/
-
             Point mouseLocation = System.Windows.Forms.Cursor.Position;
             mouseLocation = screenPB.PointToClient(mouseLocation);
-            startBlock.setLocation(mouseLocation.X-10, mouseLocation.Y-10);
+            startBlockMovingPB.Location = new Point(mouseLocation.X-10, mouseLocation.Y-10);
         }
 
         #endregion
@@ -582,6 +624,8 @@ namespace GuiScratch
             setCmsToBlock();
             block.bringToFront();
         }
+
+        #region clients
 
         private List<Block> getListOfClientsFromBlock(Block block)
         {
@@ -610,13 +654,14 @@ namespace GuiScratch
                     }
 
                     res.Add(resCB);
-                    douplicateTheValueBlocksOfABlock(curClient, ref res);
                 }
                 else
                 {
                     res.Add(curClient.Clone(blockIndex++));
-                    douplicateTheValueBlocksOfABlock(curClient, ref res);
                 }
+                //check the value client
+                res[res.Count - 1] = douplicateTheValueBlocksOfABlock(curClient, res[res.Count-1]);
+
                 curClient = curClient.Client;
             }
 
@@ -627,11 +672,6 @@ namespace GuiScratch
         {
             addBlockToList(clients[0]);
             
-            if (clients.Count == 1)
-            {
-                return;
-            }
-            
             //add the clients to the blocks list
             for (int i = 1; i <= clients.Count - 1; i++)
             {
@@ -640,12 +680,12 @@ namespace GuiScratch
             }
         }
 
-        private void douplicateTheValueBlocksOfABlock(Block originalB, ref List<Block> newBList)
+        private Block douplicateTheValueBlocksOfABlock(Block originalB, Block newBlock)
         {
             if (originalB.Kind == Block.BlockKinds.Contain)
             {
                 ContainBlock originalCB = originalB as ContainBlock;
-                ContainBlock newCB = newBList[newBList.Count - 1] as ContainBlock;
+                ContainBlock newCB = newBlock as ContainBlock;
 
                 for (int j = 0; j <= originalCB.infos.Count - 1; j++)
                 {
@@ -658,7 +698,7 @@ namespace GuiScratch
                     }
                 }
                 
-                newBList[newBList.Count - 1] = newCB;
+                newBlock = newCB;
             }
             else
             {
@@ -667,12 +707,16 @@ namespace GuiScratch
                 {
                     if (originalB.Info.BlockInfoEvents[i].Client != null)
                     {
-                        newBList[newBList.Count - 1].Info.BlockInfoEvents[i].addClient(douplicateBlockByBlockIndex(originalB.Info.BlockInfoEvents[i].Client.BlockIndex) as ValueBlock);
+                        ValueBlock newVClient = douplicateBlockByBlockIndex(originalB.Info.BlockInfoEvents[i].Client.BlockIndex) as ValueBlock;
+                        newBlock.Info.BlockInfoEvents[i].addClient(newVClient);
                     }
                 }
             }
-            
+
+            return newBlock;
         }
+
+        #endregion
 
         #endregion
 
@@ -691,8 +735,14 @@ namespace GuiScratch
         private void runButton_Click(object sender, EventArgs e)
         {
             myValues.SetupBeforeRuning();
+
+            string folderPath = "";
+            if (filePath != "")
+            {
+                folderPath = Path.GetDirectoryName(filePath);
+            }
             
-            run.runProgram(blocks, myValues);
+            run.runProgram(blocks, myValues, folderPath);
         }
         
         #endregion
@@ -777,7 +827,7 @@ namespace GuiScratch
             if (filePath == "")
             {
                 SaveFileDialog sfd = new SaveFileDialog();
-                sfd.Filter = "Gui Scratch Files (*.gus)|*.gus";
+                //sfd.Filter = "Gui Scratch Files (*.gus)|*.gus";
                 sfd.FileName = "Untiteld";
                 if (sfd.ShowDialog() == DialogResult.Cancel)
                 {
@@ -785,12 +835,15 @@ namespace GuiScratch
                 }
                 else
                 {
-                    filePath = sfd.FileName;
-                    var v = File.Create(filePath);
-                    v.Close();
+                    //create a folder that the file will be in it
+                    Directory.CreateDirectory(sfd.FileName);
+
+                    string onlyFileName = Path.GetFileName(sfd.FileName);
+                    filePath = sfd.FileName+"\\"+onlyFileName+".gus";
+                    var s = File.Create(filePath);
+                    s.Close();
                 }
             }
-            //Clipboard.SetText(FileSaveAndOpen.saveFile(blockIndex, blocks, myValues));
 
             //save the file in the file path
             StreamWriter sw = new StreamWriter(filePath);
@@ -929,7 +982,7 @@ namespace GuiScratch
         {
             if (filePath == "")
             {
-                Text = "Gui Scratch - Untiteld";
+                Text = "Gui Scratch2 - Untiteld";
             }
             else
             {

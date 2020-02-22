@@ -11,11 +11,9 @@ namespace GuiScratch
             Kind = BlockKinds.Action;
             regularBlockSize = 32;
             parentBlockSize = 27;
-
-            BlockMoveFunc = blockStartMoving;
-
+            
             //create the bmp
-            setBlock(container, blockInfo, checkClientsAndParents, blockRightClick, blockIndex);
+            setBlock(container, blockInfo, checkClientsAndParents, blockRightClick,blockStartMoving, blockIndex);
             Info.drawHeight = 9;
 
             //createTheBitmap();

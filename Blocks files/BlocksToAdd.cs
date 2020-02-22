@@ -21,7 +21,7 @@ namespace GuiScratch
             AddBlock = addBlockToProgramingPanel;
 
             this.myValues = myValues;
-
+            
             ProgramingPanelLocation = programingPanelLocation;
 
             blockInfos = new List<List<BlockInfo>>();
@@ -365,7 +365,6 @@ namespace GuiScratch
                 pb.Parent = form;
                 pb.BringToFront();
                 pb.BackColor = SystemColors.ControlDark;
-                
                 lastPoint = e.Location;
 
                 //create the new block that will stay in the place of the last button
