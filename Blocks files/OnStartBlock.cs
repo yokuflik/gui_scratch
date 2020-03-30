@@ -19,7 +19,6 @@ namespace GuiScratch
             Info.Kind = Kind;
 
             //create the bmp
-            //createTheBitmap();
             Bmp = BlocksImageCreator.drawBitmap(BlockKinds.OnStart, Info, PB);
 
             setPB(location);

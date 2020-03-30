@@ -7,6 +7,8 @@ namespace GuiScratch
 {
     public class BlockInfo
     {
+        #region start setup
+
         public BlockInfo(Values myValues, List<BlockInfoEvent> blockInfoEvents, Color backColor, BlockCode blockCode, bool canBeParent = true, bool canBeClient = true, bool needForUpdate = false)
         {
             setInfo(myValues, blockInfoEvents, backColor, blockCode, canBeParent, canBeClient, needForUpdate);
@@ -41,9 +43,39 @@ namespace GuiScratch
             NeedForUpdate = needForUpdate;
         }
 
+        #endregion
+
+        #region make clone
+
+        public BlockInfo Clone(bool checkIfDragAble = true)
+        {
+            List<BlockInfoEvent> bie = new List<BlockInfoEvent>();
+            for (int i = 0; i <= BlockInfoEvents.Count - 1; i++)
+            {
+                bie.Add(BlockInfoEvents[i].Clone(checkIfDragAble));
+            }
+
+            BlockInfo res = new BlockInfo(MyValues, bie, BackColor, BlockCode);
+
+            res.drawHeight = drawHeight;
+            res.CanBeParent = CanBeParent;
+            res.CanBeClient = CanBeClient;
+            res.NeedForUpdate = NeedForUpdate;
+            res.CanDeleteAndDouplicate = CanDeleteAndDouplicate;
+
+            res.Kind = Kind;
+            res.ValueKind = ValueKind;
+
+            res.FuncName = FuncName;
+
+            return res;
+        }
+
+        #endregion
+
         #region to and from string
 
-        #region save
+        #region to string
 
         public override string ToString()
         {
@@ -140,6 +172,8 @@ namespace GuiScratch
 
         #endregion
 
+        #region draw to bmp
+
         public void drawImageToBmp(ref Bitmap bmp, ref Point loc, ref Graphics g)
         {
             Point myLoc = new Point(loc.X, loc.Y + drawHeight);
@@ -149,29 +183,7 @@ namespace GuiScratch
             }
         }
 
-        public BlockInfo Clone()
-        {
-            List<BlockInfoEvent> bie = new List<BlockInfoEvent>();
-            for (int i = 0; i <= BlockInfoEvents.Count - 1; i++)
-            {
-                bie.Add(BlockInfoEvents[i].Clone());
-            }
-
-            BlockInfo res = new BlockInfo(MyValues, bie, BackColor, BlockCode);
-
-            res.drawHeight = drawHeight;
-            res.CanBeParent = CanBeParent;
-            res.CanBeClient = CanBeClient;
-            res.NeedForUpdate = NeedForUpdate;
-            res.CanDeleteAndDouplicate = CanDeleteAndDouplicate;
-
-            res.Kind = Kind;
-            res.ValueKind = ValueKind;
-
-            res.FuncName = FuncName;
-
-            return res;
-        }
+        #endregion
 
         #region update
 
@@ -239,6 +251,8 @@ namespace GuiScratch
 
         #endregion
 
+        #region var func
+
         public void setAddVarFunc(Action<BlockInfoEvent, Point> addVar)
         {
             for (int i = 0; i <= BlockInfoEvents.Count - 1; i++)
@@ -246,6 +260,10 @@ namespace GuiScratch
                 BlockInfoEvents[i].AddVar = addVar;
             }
         }
+
+        #endregion
+
+        #region value client
 
         public bool checkValueClient(ValueBlock currentBlock)
         {
@@ -263,6 +281,8 @@ namespace GuiScratch
             return false;
         }
 
+        #endregion
+        
         #region vars
 
         public string FuncName;
@@ -292,7 +312,7 @@ namespace GuiScratch
         public Values MyValues;
 
         public bool NeedForUpdate;
-
+        
         #endregion
     }
 }

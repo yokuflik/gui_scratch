@@ -9,3 +9,7 @@ D:\Yoel\C#\GuiScratch\GuiScratch\obj\Debug\GuiScratch.csproj.CoreCompileInputs.c
 D:\Yoel\C#\GuiScratch\GuiScratch\obj\Debug\GuiScratch.exe
 D:\Yoel\C#\GuiScratch\GuiScratch\obj\Debug\GuiScratch.pdb
 D:\Yoel\C#\GuiScratch\GuiScratch\obj\Debug\GuiScratch.AddEventFuncForm.resources
+D:\Yoel\C#\GuiScratch\GuiScratch\obj\Debug\GuiScratch.AddVariabelsAndListsForm.resources
+D:\Yoel\C#\GuiScratch\GuiScratch\obj\Debug\GuiScratch.CreateNewBlockForm.resources
+D:\Yoel\C#\GuiScratch\GuiScratch\obj\Debug\GuiScratch.AddCodeForUserBlock.resources
+D:\Yoel\C#\GuiScratch\GuiScratch\obj\Debug\GuiScratch.AddFuncForm.resources

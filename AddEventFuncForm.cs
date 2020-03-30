@@ -12,24 +12,19 @@ namespace GuiScratch
 {
     public partial class AddEventFuncForm : Form
     {
-        public AddEventFuncForm(Values myValues, Point startLocation, Form form,Point programingPanelLocation, Action<List<BlockInfo>, Point> addBlock)
+        public AddEventFuncForm(Values myValues, addBlockInfoToTheForm addBlock)
         {
             InitializeComponent();
-            Location = startLocation;
+            //Location = startLocation;
 
             MyValues = myValues;
             AddBlock = addBlock;
-            this.form = form;
-            ProgramingPanelLocation = programingPanelLocation;
         }
         
         public Values MyValues;
 
-        Action<List<BlockInfo>, Point> AddBlock;
-
-        Form form;
-        Point ProgramingPanelLocation;
-
+        addBlockInfoToTheForm AddBlock;
+        
         private void AddEventFuncForm_Load(object sender, EventArgs e)
         {
             eventKindCB.SelectedIndex = 0;
@@ -45,8 +40,6 @@ namespace GuiScratch
         }
 
         BlockInfo info;
-        Point lastPoint;
-        PictureBox pb;
 
         private void addButton_MouseDown(object sender, MouseEventArgs e)
         {
@@ -75,48 +68,10 @@ namespace GuiScratch
             //add the block
             info.Kind = Block.BlockKinds.OnStart;
             info.FuncName = eventFunc.FuncName;
-
-            pb = new PictureBox();
-            Bitmap bmp = BlocksImageCreator.drawBitmap(Block.BlockKinds.OnStart, info, pb);
-            pb.Size = bmp.Size;
-            pb.BackColor = SystemColors.ControlDark;
-            pb.Image = bmp;
-            //pb.Location = Cursor.Position;
-            Point loc = addButton.PointToScreen(e.Location);
-            //loc.Offset(-Left, -Top);
-            loc.Offset(-form.Left, -form.Top);
-            loc.Offset(-40,-40);
-
-            pb.Location = loc;
-
-            pb.MouseMove += Pb_MouseMove;
-            pb.MouseDown += Pb_MouseDown;
-
-            form.Controls.Add(pb);
-            pb.BringToFront();
-
-            lastPoint = new Point(18, 18);
-
-            //AddBlock(new List<BlockInfo>() { info }, new Point(30, 100));
+            
+            AddBlock.add(info, addButton.PointToScreen(e.Location));
 
             Close();
-        }
-
-        private void Pb_MouseMove(object sender, MouseEventArgs e)
-        {
-            pb.Left += (e.X - lastPoint.X);
-            pb.Top += (e.Y - lastPoint.Y);
-        }
-
-        private void Pb_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                pb.Parent = null;
-
-                AddBlock(new List<BlockInfo>() { info }, new Point(pb.Left - ProgramingPanelLocation.X, pb.Top - ProgramingPanelLocation.Y));
-                
-            }
         }
 
         private void addMouseEvent(Event.Kinds eventKind, ref Event eventFunc, ref BlockInfo info, Color color)

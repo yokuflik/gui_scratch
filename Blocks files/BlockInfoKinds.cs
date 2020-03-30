@@ -2,16 +2,26 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
 namespace GuiScratch
 {
     public class BlockInfoEvent
     {
-        public BlockInfoEvent(string text)
+        public BlockInfoEvent(string text, bool isInUserCreate = false)
         {
             Text = text;
             Kind = Kinds.text;
+
+            //start the label
+            startLabel();
+
+            IsInUserCreate = isInUserCreate;
+            if (isInUserCreate)
+            {
+                clickSetIsInUserCreate();
+            }
         }
 
         #region combo box
@@ -27,15 +37,30 @@ namespace GuiScratch
             ControlKind = controlKind;
 
             setComboBoxOptions(myValues);
-
-            startComboBox(comboBoxOptions);
         }
 
-        private void setComboBoxOptions(Values myValues)
+        private void setComboBoxOptions(Values myValues, bool startCB = true)
         {
             if (ControlKind == ControlsKinds.all)
             {
                 comboBoxOptions = myValues.getControls();
+            }
+            else if (ContainVars)
+            {
+                //set the combo box options to the list of the vars or to the list of the lists
+                if (ContainLists)
+                {
+                    comboBoxOptions = myValues.getLists();
+                }
+                else
+                {
+                    comboBoxOptions = myValues.getVars();
+                }
+            }
+
+            if (startCB)
+            {
+                startComboBox(comboBoxOptions);
             }
         }
         
@@ -52,25 +77,66 @@ namespace GuiScratch
                     comboBox.Items.AddRange(values.getControls());
                 }
 
-                if (selectedIndex > comboBox.Items.Count - 1 || selectedIndex == -1)
+                setSelectedIndex(selectedIndex);
+            }
+            else if (ContainVars)
+            {
+                int selectedIndex = comboBox.SelectedIndex;
+
+                comboBox.Items.Clear();
+
+                if (ContainLists)
                 {
-                    comboBox.SelectedIndex = 0;
+                    comboBox.Items.AddRange(values.getLists());
                 }
                 else
                 {
-                    comboBox.SelectedIndex = selectedIndex;
+                    comboBox.Items.AddRange(values.getVars());
                 }
 
-                setComboBoxSize();
-                
+                setSelectedIndex(selectedIndex);
             }
         }
 
+        private void setSelectedIndex(int selectedIndex)
+        {
+            if (selectedIndex > comboBox.Items.Count - 1 || selectedIndex == -1)
+            {
+                comboBox.SelectedIndex = 0;
+            }
+            else
+            {
+                comboBox.SelectedIndex = selectedIndex;
+            }
+
+            setComboBoxSize();
+        }
+
         #endregion
-        
-        public BlockInfoEvent(string[] comboBoxOptions, int selectedIndex = 0, ControlsKinds controlKind = ControlsKinds.none)
+
+        #region vars combo box
+
+        public bool ContainVars;
+        public bool ContainLists;
+
+        public BlockInfoEvent(Values myValues, bool containlists = false)
+        {
+            //set this value to true that yo can know that this info contains the vars
+            ContainVars = true;
+
+            //if this value is true so this contains lists else it contains variabels
+            ContainLists = containlists;
+
+            setComboBoxOptions(myValues);
+        }
+
+        #endregion
+
+        public BlockInfoEvent(string[] comboBoxOptions, int selectedIndex = 0, ControlsKinds controlKind = ControlsKinds.none, bool containVars = false, bool containLists = false)
         {
             ControlKind = controlKind;
+            ContainVars = containVars;
+            ContainLists = containLists;
             startComboBox(comboBoxOptions, selectedIndex);
         }
         
@@ -110,13 +176,21 @@ namespace GuiScratch
 
         #region number input 
 
-        public BlockInfoEvent(decimal startValue)
+        public BlockInfoEvent(decimal startValue, bool isInUserCreate = false)
         {
             Kind = Kinds.numberInput;
             
+            IsInUserCreate = isInUserCreate;
+
             Text = startValue.ToString();
 
             startNumberInput();
+
+            /*//set the in user create
+            if (isInUserCreate)
+            {
+                clickSetIsInUserCreate();
+            }*/
         }
         
         private void TextBox_KeyPress(object sender, KeyPressEventArgs e)
@@ -140,20 +214,33 @@ namespace GuiScratch
         {
             startTextBox();
 
-            textBox.KeyPress += TextBox_KeyPress;
+            if (IsInUserCreate) //if it is in user create it can contain letters
+            {
+                clickSetIsInUserCreate();
+            }
+            else
+            {
+                textBox.KeyPress += TextBox_KeyPress;
+            }
         }
 
         #endregion
 
         #region textInput
 
-        public BlockInfoEvent(Kinds kind, string text)
+        public BlockInfoEvent(Kinds kind, string text, bool isInUserCreate = false)
         {
             Kind = kind;
             if (Kind == Kinds.textInput)
             {
                 Text = text;
                 startTextBox();
+
+                IsInUserCreate = isInUserCreate;
+                if (IsInUserCreate)
+                {
+                    clickSetIsInUserCreate();
+                }
             }
         }
 
@@ -165,12 +252,12 @@ namespace GuiScratch
             }
         }
 
-        private void startTextBox()
+        private void startTextBox(float fontSize = 10f)
         {
             textBox = new TextBox();
-            textBox.TextChanged += TextBox_TextChanged;
-            textBox.Font = new Font("Microsoft Sans Serif", 10f);
+            textBox.Font = new Font("Microsoft Sans Serif", fontSize);
             textBox.Text = Text;
+            textBox.TextChanged += TextBox_TextChanged;
             textBox.BorderStyle = BorderStyle.None;
 
             currentC = textBox;
@@ -180,12 +267,19 @@ namespace GuiScratch
 
         #region boolean input
 
-        public BlockInfoEvent(Kinds kind)
+        public BlockInfoEvent(Kinds kind, bool isInUserCreate = false)
         {
             Kind = kind;
             if (kind == Kinds.booleanInput)
             {
                 startBooleanPanel();
+            }
+
+            IsInUserCreate = isInUserCreate;
+            if (IsInUserCreate)
+            {
+                startTextBox(10f);
+                clickSetIsInUserCreate();
             }
         }
 
@@ -198,17 +292,34 @@ namespace GuiScratch
             currentC = booleanPanel;
         }
 
+        private void setBooleanPanelSize()
+        {
+            //set the panel size
+            setTextBoxSize(textBox, 19);
+            booleanPanel.Size = new Size(textBox.Width, 20);
+        }
+
         #endregion
 
         #region color input
 
-        public BlockInfoEvent(Color color)
+        public BlockInfoEvent(Color color, bool isInUserCreate = false)
         {
             Kind = Kinds.colorInput;
 
             this.color = color;
 
-            startColorInput();
+            IsInUserCreate = isInUserCreate;
+
+            if (IsInUserCreate)
+            {
+                startTextBox();
+                clickSetIsInUserCreate();
+            }
+            else
+            {
+                startColorInput();
+            }
         }
 
         private void startColorInput()
@@ -341,6 +452,8 @@ namespace GuiScratch
         Point lastPoint;
         Label newLabel;
 
+        #region draging
+
         private void DragAbleControlMouseDown(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left && AddVar != null)
@@ -393,7 +506,130 @@ namespace GuiScratch
 
         #endregion
 
+        #endregion
+
+        #region is in user create
+
+        #region label
+
+        private void startLabel()
+        {
+            //start the label
+            label = new Label();
+            label.Font = new Font("Microsoft Sans Serif", 9.5f);
+            label.Text = Text;
+            label.ForeColor = Color.White;
+            label.AutoSize = true;
+            label.BackColor = Color.Transparent;
+
+            currentC = label;
+        }
+
+        private void clickSetIsInUserCreate()
+        {
+            //add the click func to the current control that is used
+            if (Kind == Kinds.text)
+            {
+                currentC.Click += CurrentC_Click;
+            }
+            else
+            {
+                textBox.TextChanged += VarNameTextBox_TextChanged;
+            }
+        }
+
+        public void CurrentC_Click(object sender, EventArgs e)
+        {
+            Color backColor = Color.Purple;
+
+            //this func is called when this block is in a user create
+            /*switch (Kind)
+            {
+                case Kinds.text:*/
+            //switch the label to a textBox
+            label.Visible = false;
+            startTextBox();
+            textBox.Location = label.Location;
+            setTextBoxSize();
+            textBox.Parent = label.Parent;
+            textBox.Select();
+
+            //add the end of user adding
+            textBox.KeyDown += labelTextBox_KeyDown;
+            textBox.LostFocus += labelTextBox_LostFocus;
+            /*break;
+            }*/
+        }
+
+        private void labelTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                EndUserAdding();
+            }
+        }
         
+        private void labelTextBox_LostFocus(object sender, EventArgs e)
+        {
+            EndUserAdding();
+        }
+
+        private void EndUserAdding()
+        {
+            /*switch (Kind)
+            {
+                case Kinds.text:*/
+            //save the new text
+            Text = textBox.Text;
+            label.Text = textBox.Text;
+
+            //remove the text box and the label
+            textBox.Dispose();
+            textBox = null;
+
+            label.Visible = true;
+            currentC = label;
+            /*break;
+    }*/
+        }
+
+        #region set selected
+
+        public void setToNotSelected()
+        {
+            if (textBox != null && Kind == Kinds.text)
+            {
+                EndUserAdding();
+            }
+            
+        }
+
+        public bool checkIfIsSelected()
+        {
+            if (IsInUserCreate && textBox != null && Kind == Kinds.text)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        #endregion
+
+        #endregion
+
+        private void VarNameTextBox_TextChanged(object sender, EventArgs e)
+        {
+            Text = textBox.Text;
+            string reason = "";
+            if (!Values.checkIfTheNameIsGoodForVarOrList(ref reason, textBox.Text, false))
+            {
+                MessageBox.Show(reason);
+            }
+            
+        }
+        
+        #endregion
+
         #region draw image to bmp
 
         public void drawImageToBmp(ref Bitmap bmp, ref Point loc, ref Graphics g)
@@ -404,53 +640,42 @@ namespace GuiScratch
                 Client.drawImageToBmp(ref bmp, ref myLoc, ref g);
             }
             
-            /*else
-            {
-                switch (Kind)
-                {
-                    case Kinds.colorInput:
-                        myLoc.Y -= 2;
-                        g.FillRectangle(new SolidBrush(color), new Rectangle(myLoc, pictureBox.Size));
-                        break;
-                    case Kinds.numberInput:
-                        myLoc.X += marginNI;
-                        myLoc.Y -= 1;
-                        textBox.DrawToBitmap(bmp, new Rectangle(myLoc, textBox.Size));
-                        break;
-                    case Kinds.textInput:
-                        textBox.DrawToBitmap(bmp, new Rectangle(myLoc, textBox.Size));
-                        break;
-                    case Kinds.comboBox:
-                        myLoc.Y -= 3;
-                        comboBox.DrawToBitmap(bmp, new Rectangle(myLoc, comboBox.Size));
-                        break;
-                }
-            }*/
-
             //add the width to the myLoc
             loc.X += getWidth();
         }
 
         #endregion
     
-
-        public bool IsDragAble = false;
-        public Action<BlockInfoEvent, Point> AddVar;
-        
         public string getText()
         {
             if (Client == null)
             {
                 switch (Kind)
                 {
+                    case Kinds.text:
+                        return Text;
                     case Kinds.textInput:
                         return "\"" + textBox.Text + "\"";
                     case Kinds.numberInput:
-                        return textBox.Text;
+                        if (textBox == null)
+                        {
+                            return Text;
+                        }
+                        else
+                        {
+                            return textBox.Text;
+                        }
                     case Kinds.comboBox:
                         if (ControlKind == ControlsKinds.none)
                         {
-                            return comboBox.Text.Substring(0, 1).ToUpper() + comboBox.Text.Substring(1); //returns the combo box text and makes the first letter to be upper case
+                            if (ContainVars)//dont make the first char to upper
+                            {
+                                return comboBox.Text; //returns the combo box text
+                            }
+                            else //make the first char to upper
+                            {
+                                return comboBox.Text.Substring(0, 1).ToUpper() + comboBox.Text.Substring(1); //returns the combo box text and makes the first letter to be upper case
+                            }
                         }
                         else
                         {
@@ -479,9 +704,9 @@ namespace GuiScratch
 
         public override string ToString()
         {
-            //returns kind isDragAble (if is darg able BlockCode) var controlKind ((if is a combo box and control kind is none)comboBoxOptionsCount
+            //returns kind containVars containLists isDragAble (if is darg able BlockCode) var controlKind ((if is a combo box and control kind is none)comboBoxOptionsCount
             // comboBoxOptions) client
-            string res = "\x0001" + ((int)Kind).ToString() + "\x0001" + IsDragAble.ToString() + "\x0001";
+            string res = "\x0001" + ((int)Kind).ToString() + "\x0001" + ContainVars.ToString() + "\x0001" + ContainLists.ToString() + "\x0001" + IsDragAble.ToString() + "\x0001";
 
             if (IsDragAble)
             {
@@ -544,6 +769,9 @@ namespace GuiScratch
         {
             Kind = (Kinds)int.Parse(vars[index++]);
 
+            ContainVars = BlockInfo.stringToBool(vars[index++]);
+            ContainLists = BlockInfo.stringToBool(vars[index++]);
+
             IsDragAble = BlockInfo.stringToBool(vars[index++]);
 
             if (IsDragAble)
@@ -551,7 +779,7 @@ namespace GuiScratch
                 code = new BlockCode(vars, ref index);
             }
 
-                varS = vars[index++];
+            varS = vars[index++];
 
             ControlKind = (ControlsKinds)int.Parse(vars[index++]);
 
@@ -599,7 +827,7 @@ namespace GuiScratch
                         startNumberInput();
                         break;
                     case Kinds.comboBox:
-                        setComboBoxOptions(myValues);
+                        setComboBoxOptions(myValues, false);
                         if (comboBoxOptions == null)
                         {
                             comboBoxOptions = new string[0];
@@ -623,10 +851,10 @@ namespace GuiScratch
         public Kinds Kind;
 
         string Text;
-
+        
         ComboBox comboBox;
 
-        TextBox textBox;
+        public TextBox textBox;
 
         Panel booleanPanel;
 
@@ -636,7 +864,12 @@ namespace GuiScratch
         public ValueBlock Client { get; set; }
 
         public Action<bool> UpdateBlock;
-
+        
+        public bool IsInUserCreate;
+        
+        public bool IsDragAble = false;
+        public Action<BlockInfoEvent, Point> AddVar;
+        
         #endregion
 
         #region buliding funcs
@@ -662,7 +895,15 @@ namespace GuiScratch
             {
                 if (Kind == Kinds.text)
                 {
-                    return getTextSize(Text).Width;
+                    if (IsInUserCreate && textBox != null)
+                    {
+                        setTextBoxSize();
+                        return textBox.Width+5;
+                    }
+                    else
+                    {
+                        return getTextSize(Text).Width;
+                    }
                 }
                 else if (Kind == Kinds.comboBox)
                 {
@@ -670,8 +911,15 @@ namespace GuiScratch
                 }
                 else if (Kind == Kinds.numberInput)
                 {
-                    setTextBoxSize();
-                    return textBox.Width + 20;
+                    /*if (textBox != null)
+                    {*/
+                        setTextBoxSize();
+                        return textBox.Width + 20;
+                    /*}
+                    else
+                    {
+                        return label.Width + 20;
+                    }*/
                 }
                 else if (Kind == Kinds.textInput)
                 {
@@ -680,11 +928,27 @@ namespace GuiScratch
                 }
                 else if (Kind == Kinds.booleanInput)
                 {
-                    return booleanPanel.Width + 20;
+                    if (IsInUserCreate)
+                    {
+                        setBooleanPanelSize();
+                        return booleanPanel.Width + 25;
+                    }
+                    else
+                    {
+                        return booleanPanel.Width + 20;
+                    }
                 }
                 else if (Kind == Kinds.colorInput)
                 {
-                    return pictureBox.Width;
+                    if (IsInUserCreate)
+                    {
+                        setTextBoxSize();
+                        return textBox.Width + 5;
+                    }
+                    else
+                    {
+                        return pictureBox.Width;
+                    }
                 }
             }
             else //has a client
@@ -716,7 +980,23 @@ namespace GuiScratch
             {
                 if (Kind == Kinds.text)
                 {
-                    g.DrawString(Text, new Font("Microsoft Sans Serif", 10f), Brushes.White, drawPoint);
+                    if (IsInUserCreate)
+                    {
+                        if (textBox == null)
+                        {
+                            label.Location = new Point(drawPoint.X - 2, drawPoint.Y);
+                            PB.Controls.Add(label);
+                        }
+                        else
+                        {
+                            setTextBoxSize();
+                        }
+                    }
+                    else
+                    {
+                        g.DrawString(Text, new Font("Microsoft Sans Serif", 10f), Brushes.White, drawPoint);
+                    }
+                    
                 }
                 else if (Kind == Kinds.comboBox)
                 {
@@ -746,13 +1026,13 @@ namespace GuiScratch
                         setTextBoxSize();
                         drawPoint.Y += 1;
                         //textBox.Size = new Size(TextRenderer.MeasureText(textBox.Text, new System.Drawing.Font("Microsoft Sans Serif", 10f)).Width, 20);
-                        textBox.Location = new Point(drawPoint.X + 9, drawPoint.Y +marginElse);
+                        currentC.Location = new Point(drawPoint.X + 9, drawPoint.Y +marginElse);
 
-                        PB.Controls.Add(textBox);
+                        PB.Controls.Add(currentC);
                         if (Client == null)
                         {
                             g.FillEllipse(Brushes.White, new Rectangle(drawPoint.X, drawPoint.Y - 3, 15, 17));
-                            g.FillEllipse(Brushes.White, new Rectangle(drawPoint.X + textBox.Width, drawPoint.Y - 3, 15, 17));
+                            g.FillEllipse(Brushes.White, new Rectangle(drawPoint.X + currentC.Width, drawPoint.Y - 3, 15, 17));
                         }
                     }
 
@@ -766,8 +1046,20 @@ namespace GuiScratch
                 }
                 else if (Kind == Kinds.booleanInput)
                 {
+
                     booleanPanel.Location = new Point(drawPoint.X + 9, drawPoint.Y +marginElse);
-                    PB.Controls.Add(booleanPanel);
+
+                    //is in user create
+                    if (IsInUserCreate)
+                    {
+                        setBooleanPanelSize();
+                        textBox.Location = new Point(drawPoint.X+6, drawPoint.Y-1);
+                        PB.Controls.Add(textBox);
+                    }
+                    else
+                    {
+                        PB.Controls.Add(booleanPanel);
+                    }
                     //booleanPanel.BackColor = backColor;
                     //PB.Controls.Add(booleanPanel);
 
@@ -784,15 +1076,24 @@ namespace GuiScratch
 
                     gp.CloseFigure();
 
-                    g.FillPath(new SolidBrush(Color.FromArgb(100, Color.White)), gp);
+                    if (IsInUserCreate) //do the color white
+                    {
+                        g.FillPath(new SolidBrush(Color.White), gp);
+
+                    }
+                    else
+                    {
+                        g.FillPath(new SolidBrush(Color.FromArgb(100, Color.White)), gp);
+                    }
                     g.DrawPath(new Pen(Color.Black, 1), gp);
 
                     booleanPanel.Location = new Point(drawPoint.X - 10, drawPoint.Y);
+                    
                 }
                 else if (Kind == Kinds.colorInput)
                 {
-                    pictureBox.Location = new Point(drawPoint.X, drawPoint.Y +marginElse);
-                    pictureBox.Parent = PB;
+                    currentC.Location = new Point(drawPoint.X, drawPoint.Y +marginElse);
+                    currentC.Parent = PB;
                 }
             }
             else
@@ -803,26 +1104,45 @@ namespace GuiScratch
 
         private void setTextBoxSize()
         {
-            if (Client == null)
+            if (Client == null && textBox != null)
             {
-                setTextBoxSize(textBox);
+                setTextBoxSize(textBox, textBox.Height);
                 //textBox.Size = new Size(Math.Max(10, TextRenderer.MeasureText(textBox.Text, new Font(textBox.Font.FontFamily, 9.75f), new Size(int.MaxValue, int.MaxValue), TextFormatFlags.NoPadding).Width), 20);
             }
         }
 
-        private void setTextBoxSize(TextBox textBox)
+        public static void setTextBoxSize(TextBox textBox, int height = 20)
         {
-            textBox.Size = new Size(Math.Max(10, getTextSize(textBox.Text).Width), 20);
+            textBox.Size = new Size(Math.Max(10, getTextSize(textBox.Text).Width), height);
         }
 
-        private Size getTextSize(string text)
+        private static Size getTextSize(string text)
         {
             return TextRenderer.MeasureText(text, new Font("Microsoft Sans Serif", 9.75f), new Size(int.MaxValue, int.MaxValue), TextFormatFlags.NoPadding);
         }
 
-        public BlockInfoEvent Clone()
+        public BlockInfoEvent Clone(bool checkIfDragAble = true)
         {
-            if (IsDragAble)
+            //set the text
+            string text = "";
+            if (textBox != null)
+            {
+                text = textBox.Text;
+            }
+            else
+            {
+                if (Kind == Kinds.numberInput)
+                {
+                    text = "0";
+                }
+                else
+                {
+                    text = "write text here";
+                }
+            }
+
+            //make the block info event clone
+            if (IsDragAble && checkIfDragAble)
             {
                 return new BlockInfoEvent(Kind, label.Text,code, IsDragAble);
             }
@@ -840,11 +1160,11 @@ namespace GuiScratch
                             res[i] = comboBox.Items[i].ToString();
                         }
 
-                        return new BlockInfoEvent(res, comboBox.SelectedIndex, ControlKind);
+                        return new BlockInfoEvent(res, comboBox.SelectedIndex, ControlKind, ContainVars, ContainLists);
                     case Kinds.numberInput:
-                        return new BlockInfoEvent(decimal.Parse(textBox.Text));
+                        return new BlockInfoEvent(decimal.Parse(text));
                     case Kinds.textInput:
-                        return new BlockInfoEvent(Kinds.textInput, textBox.Text);
+                        return new BlockInfoEvent(Kinds.textInput, text);
                     case Kinds.booleanInput:
                         return new BlockInfoEvent(Kinds.booleanInput);
                     case Kinds.colorInput:

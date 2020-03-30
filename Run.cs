@@ -119,22 +119,19 @@ namespace FormWithButton
         {
             string res = "";
             //add the usings
-            res += "using System;\nusing System.ComponentModel;\nusing System.Drawing;\nusing System.Windows.Forms;\nusing System.Runtime.InteropServices;\nusing System.Threading; ";
+            res += "using System;\nusing System.ComponentModel;\nusing System.Drawing;\nusing System.Windows.Forms;" +
+                "\nusing System.Runtime.InteropServices;\nusing System.Threading;\nusing System.Collections.Generic; ";
 
             //add the namespace and class
-            res += "\nnamespace FormWithButton\n{\npublic class Form1 : Form\n{";
+            res += "\n\nnamespace FormWithButton\n{\npublic class Form1 : Form\n{";
 
             //add the code to close the command line window and open the form window
             res += "\n[DllImport(\"kernel32.dll\")]\nstatic extern IntPtr GetConsoleWindow();\n\n[DllImport(\"user32.dll\")]\n static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);";
 
             //add the main func
             res += "\n\n[STAThread]\nstatic void Main()\n{\n\nShowWindow(GetConsoleWindow(), 0);\nApplication.EnableVisualStyles();\nApplication.SetCompatibleTextRenderingDefault(false);\nApplication.Run(new Form1());\n}";
-
-            //add form1 func
-            /*res += "\n\npublic Button button1;\npublic Form1()\n{\nbutton1 = new Button();\nbutton1.Size = new Size(40, 40);";
-            res += "\nbutton1.Location = new Point(30, 30);\nbutton1.Text = \"Click me\";\nthis.Controls.Add(button1);\nbutton1.Click += new EventHandler(button1_Click);\n}";
-            res += "private void button1_Click(object sender, EventArgs e)\n{\nMessageBox.Show(\"Hello World\");\n}";*/
-
+            
+            //add the form1 func
             res += "\n\npublic Form1()\n{\nInitializeComponent();\n}";
 
             //add InitalizeComponentFunc
@@ -154,18 +151,14 @@ namespace FormWithButton
 
         private string getInitalizeComponentFunc()
         {
+            //add the controls names in the class so it will be global
             string res = addUserControlsNames();
 
+            //add the variabels names in the class so it will be global
+            res += addUserVariabelsAndLists();
+
             res += "\n\nprivate void InitializeComponent()\n{";
-
-            //add the start making
-
-            //set the form size
-            //res += "\nSize = new Size(" + formWidthNUD.Value.ToString() + ", " + formHeightNUd.Value.ToString() + ");";
-
-            //set the form text
-            //res += "\nText = " + "\"" + formCaptionTB.Text + "\"" + ";";
-
+            
             res += "\nActivated += Form1_Activated;";
 
             //add the user controls
@@ -182,7 +175,7 @@ namespace FormWithButton
 
             return res;
         }
-
+        
         #region get user code
 
         private string getUserCode()
@@ -319,6 +312,29 @@ namespace FormWithButton
                         res += getCodeFromFunc(blocks[i] as OnStartBlock);
                     }
                 }
+            }
+
+            return res;
+        }
+
+        #endregion
+
+        #region user vars
+        
+        private string addUserVariabelsAndLists()
+        {
+            string res = "";
+
+            //vars
+            for (int i = 0; i <= myValues.vars.Count - 1; i++)
+            {
+                res += "string " + Values.getUserVarName(myValues.vars[i].Name) + " = \"\";";
+            }
+
+            //lists
+            for (int i = 0; i <= myValues.lists.Count - 1; i++)
+            {
+                res += "List<string> " + Values.getUserListName(myValues.lists[i].Name) + " = new List<string>();";
             }
 
             return res;

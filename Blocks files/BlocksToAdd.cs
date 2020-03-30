@@ -13,6 +13,8 @@ namespace GuiScratch
         public Values myValues;
         Panel btnsPanel;
 
+        addBlockInfoToTheForm AddBlockInfo;
+
         public BlocksToAdd(Form form,Panel addBlocksPanel, Values myValues, Action<List<BlockInfo>, Point> addBlockToProgramingPanel, Point programingPanelLocation)
         {
             this.form = form;
@@ -24,11 +26,13 @@ namespace GuiScratch
             
             ProgramingPanelLocation = programingPanelLocation;
 
+            AddBlockInfo = new addBlockInfoToTheForm(form, ProgramingPanelLocation, AddBlock);
+
             blockInfos = new List<List<BlockInfo>>();
 
             //set the buttons panel
             btnsPanel = new Panel();
-            btnsPanel.Location = new Point(7, 102);
+            btnsPanel.Location = new Point(7, 142);
             btnsPanel.Size = new Size(270, AddBlocksPanel.Height-140);
             btnsPanel.Anchor = ((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
             | AnchorStyles.Left);
@@ -48,12 +52,26 @@ namespace GuiScratch
         RadioButton controlsRB;
         RadioButton operatorsRB;
         RadioButton valuesRB;
+        RadioButton variabelsRB;
+        RadioButton funcsRB;
+
+        Button createBlockBtn;
 
         private void setTheCategoryButtons()
         {
+            //add the add block button
+            createBlockBtn = new Button();
+            createBlockBtn.Location = new Point(40, 8);
+            createBlockBtn.Size = new Size(200, 30);
+            createBlockBtn.Text = "Create a new block";
+            createBlockBtn.Font = new Font("Microsoft Sans Serif", 12f);
+            createBlockBtn.BackColor = Color.Orange;
+            createBlockBtn.Click += CreateBlockBtn_Click;
+            AddBlocksPanel.Controls.Add(createBlockBtn);
+
             //create the catagory panel
             catagoryButtonsPanel = new FlowLayoutPanel();
-            catagoryButtonsPanel.Location = new Point(7, 2);
+            catagoryButtonsPanel.Location = new Point(7, 42);
             catagoryButtonsPanel.Size = new Size(270, 100);
             //catagoryButtonsPanel.BorderStyle = BorderStyle.FixedSingle;
             catagoryButtonsPanel.Font = new Font("Microsoft Sans Serif", 10);
@@ -64,11 +82,13 @@ namespace GuiScratch
             addCatagoryButton(ref controlsRB, "Controls", Color.CadetBlue);
             addCatagoryButton(ref operatorsRB, "Operators", Color.MediumSeaGreen);
             addCatagoryButton(ref valuesRB, "Values", Color.Purple);
+            addCatagoryButton(ref variabelsRB, "Variabels", Color.Red);
+            addCatagoryButton(ref funcsRB, "Funcs", Color.Coral);
 
             //create the current buttons
             Rb_CheckedChanged(null, null);
         }
-
+        
         private void addCatagoryButton(ref RadioButton rb, string name, Color color, bool isChecked = false)
         {
             rb = new RadioButton();
@@ -97,6 +117,7 @@ namespace GuiScratch
             height += btn.Height + 15;
         }
         
+        //this func is called when the selected catagory is changed
         public void Rb_CheckedChanged(object sender, EventArgs e)
         {
             //check witch radio button is checked and set the buttons
@@ -118,6 +139,14 @@ namespace GuiScratch
             {
                 showValuesButtons();
             }
+            else if (variabelsRB.Checked)
+            {
+                showVariabelButtons();
+            }
+            else if (funcsRB.Checked)
+            {
+                showFuncsButtons();
+            }
         }
 
         private void clearTheCurButtons()
@@ -128,7 +157,7 @@ namespace GuiScratch
             height = 20;
         }
 
-        #region buttons
+        #region all blocks
 
         private void showMainButtons()
         {
@@ -157,6 +186,11 @@ namespace GuiScratch
             BlockInfo repeatInfo = new BlockInfo(myValues, new List<BlockInfoEvent>() { new BlockInfoEvent("Repeat"), new BlockInfoEvent(10), new BlockInfoEvent("Times") }, color, repeatCode);
             addBlock(Block.BlockKinds.Contain, repeatInfo);
 
+            //add the while block
+            BlockCode whileCode = new BlockCode(new List<CodePart>() { new CodePart("while ("), new CodePart(1), new CodePart(")") });
+            BlockInfo whileInfo = makeBlockInfo(new List<BlockInfoEvent>() { new BlockInfoEvent("While "), new BlockInfoEvent(BlockInfoEvent.Kinds.booleanInput) }, whileCode, color);
+            addBlock(Block.BlockKinds.Contain, whileInfo);
+
             //add sleep seconds
             BlockCode sleepCode = new BlockCode(new List<CodePart>() { new CodePart("System.Threading.Thread.Sleep((int)"), new CodePart(1), new CodePart(")") });
             addBlock(Block.BlockKinds.Action, new BlockInfo(myValues, new List<BlockInfoEvent>() { new BlockInfoEvent("Sleep"), new BlockInfoEvent(1000), new BlockInfoEvent("milliseconds") }, color, sleepCode));
@@ -174,6 +208,11 @@ namespace GuiScratch
         private void showControlsButtons()
         {
             Color color = controlsRB.BackColor;
+
+            //bring to front button
+            BlockCode bringToFrontCode = new BlockCode(new List<CodePart>() { new CodePart(1, true), new CodePart(".BringToFront();") });
+            BlockInfo bringToFrontInfo = makeBlockInfo(new List<BlockInfoEvent>() { new BlockInfoEvent("Bring "), new BlockInfoEvent(BlockInfoEvent.ControlsKinds.all, myValues), new BlockInfoEvent("to be on the front of the screen") }, bringToFrontCode, color, true, true, true);
+            addBlock(Block.BlockKinds.Action, bringToFrontInfo);
 
             //add set visibility block
             BlockCode setVisibileCode = new BlockCode(new List<CodePart>() { new CodePart(1, true), new CodePart(".Visible = "), new CodePart(3) });
@@ -196,6 +235,11 @@ namespace GuiScratch
             BlockInfo setBackColorInfo = new BlockInfo(myValues, new List<BlockInfoEvent>() { new BlockInfoEvent("Set back color of "), new BlockInfoEvent(BlockInfoEvent.ControlsKinds.all, myValues), new BlockInfoEvent("to"), new BlockInfoEvent(Color.Blue) }, color, setBackColorCode, true, true, true);
             addBlock(Block.BlockKinds.Action, setBackColorInfo);
 
+            //add the set image block
+            BlockCode setBlockImageCode = new BlockCode(new List<CodePart>() { new CodePart(1, true), new CodePart(".Image = Image.FromFile("), new CodePart(3), new CodePart(");") });
+            BlockInfo setBlockImageInfo = makeBlockInfo(new List<BlockInfoEvent>() { new BlockInfoEvent("Set image of "), new BlockInfoEvent(BlockInfoEvent.ControlsKinds.all, myValues), new BlockInfoEvent("to "), new BlockInfoEvent(BlockInfoEvent.Kinds.textInput, "") }, setBlockImageCode, color, true, true, true);
+            addBlock(Block.BlockKinds.Action, setBlockImageInfo);
+            
             //add the get all controls numbers gets - left, top, width, height
             BlockCode getAllNumbersCode = new BlockCode(new List<CodePart>() { new CodePart(2,true), new CodePart("."), new CodePart(0)});
             BlockInfo getAllNumbersInfo = new BlockInfo(myValues, new List<BlockInfoEvent>() { new BlockInfoEvent(new string[] { "left", "top", "width", "height" }), new BlockInfoEvent("of"), new BlockInfoEvent(BlockInfoEvent.ControlsKinds.all, myValues) }, color, getAllNumbersCode, true,true,true);
@@ -264,25 +308,295 @@ namespace GuiScratch
             falseBlockInfo.ValueKind = ValueBlock.ValueKinds.boolean;
             addBlock(Block.BlockKinds.Value, falseBlockInfo);
 
+            //add string to int button
+            BlockCode stringToIntCode = new BlockCode(new List<CodePart>() { new CodePart("int.Parse("), new CodePart(0), new CodePart(")") });
+            BlockInfo stringToIntInfo = makeBlockInfo(new List<BlockInfoEvent>() { new BlockInfoEvent(BlockInfoEvent.Kinds.textInput, "") }, stringToIntCode, color);
+            stringToIntInfo.ValueKind = ValueBlock.ValueKinds.number;
+            addBlock(Block.BlockKinds.Value, stringToIntInfo);
+
         }
 
-        #region add event func to a control
+        #region show varaibels and lists
+
+        private void showVariabelButtons(bool showLists = true)
+        {
+            Color color = variabelsRB.BackColor;
+
+            //add the add variabels button
+            addButtonToCatagory("Add variabel", AddVariabels_Click);
+
+            //show this buttons only if the user made a var
+            if (myValues.vars.Count != 0)
+            {
+                //add all the variabels blocks
+
+                //add the set var value
+                BlockCode setValueCode = new BlockCode(new List<CodePart>() { new CodePart(1, false, true), new CodePart(" = "), new CodePart(3) });
+                BlockInfo setValueInfo = makeBlockInfo(new List<BlockInfoEvent>() { new BlockInfoEvent("Set"),
+                new BlockInfoEvent(myValues), new BlockInfoEvent("to"), new BlockInfoEvent(BlockInfoEvent.Kinds.textInput,"") },
+                    setValueCode, color, true);
+                addBlock(Block.BlockKinds.Action, setValueInfo);
+
+                //add the vars open list button
+                addButtonToCatagory("Vars", ShowVars_Click);
+            }
+
+            if (showLists)
+            {
+                //set the vars to be closed
+                varsOpend = false;
+
+                showAllTheListBlocks();
+            }
+            
+        }
+
+        private void showAllTheListBlocks()
+        {
+            Color color = Color.Red;
+
+            //add the add lists button
+            addButtonToCatagory("Add list", AddLists_Click);
+
+            //show this buttons only if the user made a list
+            if (myValues.lists.Count != 0)
+            {
+                //add all the lists blocks
+
+                //add the add item to list
+                BlockCode addItemCode = new BlockCode(new List<CodePart>() { new CodePart(3, false, false, true), new CodePart(".Add("), new CodePart(1), new CodePart(")") });
+                BlockInfo addItemInfo = makeBlockInfo(new List<BlockInfoEvent>() { new BlockInfoEvent("Add"), new BlockInfoEvent(BlockInfoEvent.Kinds.textInput, ""), new BlockInfoEvent("to"), new BlockInfoEvent(myValues, true) }, addItemCode, color, true);
+                addBlock(Block.BlockKinds.Action, addItemInfo);
+
+                List<string> l = new List<string>();
+                //l.Insert(1, "");
+
+                //add the delete item from list
+                BlockCode deleteItemCode = new BlockCode(new List<CodePart>() { new CodePart(3, false, false, true), new CodePart(".Remove("), new CodePart(1), new CodePart(")") });
+                BlockInfo deleteItemInfo = makeBlockInfo(new List<BlockInfoEvent>() { new BlockInfoEvent("Remove"), new BlockInfoEvent(BlockInfoEvent.Kinds.textInput, ""), new BlockInfoEvent("from"), new BlockInfoEvent(myValues, true) }, deleteItemCode, color, true);
+                addBlock(Block.BlockKinds.Action, deleteItemInfo);
+
+                //add the remove range block
+                BlockCode removeRangeCode = new BlockCode(new List<CodePart>() { new CodePart(5, false, false, true), new CodePart(".RemoveRange("), new CodePart(1), new CodePart(", "), new CodePart(3), new CodePart(")") });
+                BlockInfo removeRangeInfo = makeBlockInfo(new List<BlockInfoEvent>() { new BlockInfoEvent("Remove from"), new BlockInfoEvent((decimal)0), new BlockInfoEvent("Count:"), new BlockInfoEvent((decimal)1), new BlockInfoEvent("from"), new BlockInfoEvent(myValues, true) }, removeRangeCode, color, true);
+                addBlock(Block.BlockKinds.Action, removeRangeInfo);
+
+                //add the insert item block
+                BlockCode insertItemCode = new BlockCode(new List<CodePart>() { new CodePart(5, false, false, true), new CodePart(".Insert((int)"), new CodePart(3), new CodePart(", "), new CodePart(1), new CodePart(")") });
+                BlockInfo insertItemInfo = makeBlockInfo(new List<BlockInfoEvent>() { new BlockInfoEvent("Insert"), new BlockInfoEvent(BlockInfoEvent.Kinds.textInput, ""), new BlockInfoEvent("at"), new BlockInfoEvent((decimal)0), new BlockInfoEvent("in"), new BlockInfoEvent(myValues, true) }, insertItemCode, color, true);
+                addBlock(Block.BlockKinds.Action, insertItemInfo);
+                
+                //add the replaceItem block
+                BlockCode replaceItemCode = new BlockCode(new List<CodePart>() { new CodePart(3, false, false, true), new CodePart("["), new CodePart(1, false, false, false), new CodePart("] = "), new CodePart(5, false, false, false), });
+                BlockInfo replaceItemInfo = makeBlockInfo(new List<BlockInfoEvent>() { new BlockInfoEvent("Replace item"), new BlockInfoEvent((decimal)0), new BlockInfoEvent("of"), new BlockInfoEvent(myValues, true), new BlockInfoEvent("with"), new BlockInfoEvent(BlockInfoEvent.Kinds.textInput, ""), }, replaceItemCode, color, true);
+                addBlock(Block.BlockKinds.Action, replaceItemInfo);
+                
+                //add the itemOfList block
+                BlockCode itemOfListCode = new BlockCode(new List<CodePart>() { new CodePart(3, false, false, true), new CodePart("["), new CodePart(1, false, false, false), new CodePart("]"), });
+                BlockInfo itemOfListInfo = makeBlockInfo(new List<BlockInfoEvent>() { new BlockInfoEvent("Item"), new BlockInfoEvent((decimal)0), new BlockInfoEvent("of"), new BlockInfoEvent(myValues, true), }, itemOfListCode, color, true);
+                itemOfListInfo.ValueKind = ValueBlock.ValueKinds.text;
+                addBlock(Block.BlockKinds.Value, itemOfListInfo);
+                
+                //add the Length block
+                BlockCode LengthCode = new BlockCode(new List<CodePart>() { new CodePart(1, false, false, true), new CodePart(".Count"), });
+                BlockInfo LengthInfo = makeBlockInfo(new List<BlockInfoEvent>() { new BlockInfoEvent("Length of"), new BlockInfoEvent(myValues, true), }, LengthCode, color, true);
+                LengthInfo.ValueKind = ValueBlock.ValueKinds.number;
+                addBlock(Block.BlockKinds.Value, LengthInfo);
+
+                //add the checkIfContains block
+                BlockCode checkIfContainsCode = new BlockCode(new List<CodePart>() { new CodePart(0, false, false, true), new CodePart(".Contains("), new CodePart(2, false, false, false), new CodePart(")"), });
+                BlockInfo checkIfContainsInfo = makeBlockInfo(new List<BlockInfoEvent>() { new BlockInfoEvent(myValues, true), new BlockInfoEvent("contains"), new BlockInfoEvent(BlockInfoEvent.Kinds.textInput, ""), new BlockInfoEvent("?"), }, checkIfContainsCode, color, true);
+                checkIfContainsInfo.ValueKind = ValueBlock.ValueKinds.boolean;
+                addBlock(Block.BlockKinds.Value, checkIfContainsInfo);
+            }
+        }
+
+        #endregion
         
-        private void AddEventFunc_Click(object sender, EventArgs e)
+        private void showFuncsButtons()
+        {
+            Color color = Color.Coral;
+
+            //add the add func Button
+            addButtonToCatagory("Add func", AddFunc_Click);
+
+            //create all the funcs buttons
+            for (int i = 0; i <= myValues.funcs.Count - 1; i++)
+            {
+                //show the call func block
+                addBlock(Block.BlockKinds.Action, myValues.funcs[i].Info);
+            }
+        }
+        
+        private BlockInfo makeBlockInfo(List<BlockInfoEvent> events, BlockCode code, Color color, bool needForUpdate = false, bool canBeParent = true, bool canBeClient = true)
+        {
+            return new BlockInfo(myValues, events, color, code, canBeParent, canBeClient, needForUpdate);
+        }
+
+        #region buttons
+
+        private void openFormFromAButton(object sender, Form form)
         {
             //set the window start position
             Button b = sender as Button;
             Point loc = b.PointToScreen(new Point());
             loc.Offset(-70, -30);
 
-            AddEventFuncForm form = new AddEventFuncForm(myValues, loc,this.form,ProgramingPanelLocation, AddBlock);
+            form.Location = loc;
+
             form.Owner = this.form;
             form.Show();
+        }
+
+        #region add event func to a control
+
+        private void AddEventFunc_Click(object sender, EventArgs e)
+        {
+            AddEventFuncForm form = new AddEventFuncForm(myValues,AddBlockInfo);
+            openFormFromAButton(sender, form);
+        }
+
+        #endregion
+
+        #region add variabels and lists
+
+        #region variabels
+
+        private void AddVariabels_Click(object sender, EventArgs e)
+        {
+            openFormFromAButton(sender, new AddVariabelsAndListsForm(myValues, updateVars, true));
+        }
+
+        private void ShowVars_Click(object sender, EventArgs e)
+        {
+            updateVars();
+        }
+        
+        bool varsOpend = false;
+        private void updateVars(bool showVars = false)
+        {
+            //show all the vars in a list
+            if (showVars)
+            {
+                //this thing is made when the user adds a variabel so it opens the list of the vars outomaticly
+                varsOpend = true;
+            }
+            else
+            {
+                varsOpend = !varsOpend;
+            }
+
+            Color color = Color.Red;
+
+            //clear all the values and set the height to the startup value
+            btnsPanel.Controls.Clear();
+
+            height = 20;
+
+            if (varsOpend)
+            {
+                //show the variabels blocks
+                showVariabelButtons(false);
+                
+                //show the vars
+                for (int i = 0; i <= myValues.vars.Count - 1; i++)
+                {
+                    //myValues.vars[i]
+                    BlockCode varCode = new BlockCode(new List<CodePart>() { new CodePart(myValues.vars[i].Name, false, true) });
+                    BlockInfo varInfo = makeBlockInfo(new List<BlockInfoEvent>() { new BlockInfoEvent(myValues.vars[i].Name) }, varCode, color);
+                    addBlock(Block.BlockKinds.Value, varInfo);
+                }
+
+                //add the lists blocks
+                showAllTheListBlocks();
+            }
+            else
+            {
+                showVariabelButtons();
+            }
+        }
+
+        #endregion
+        
+        #region lists
+
+        private void AddLists_Click(object sender, EventArgs e)
+        {
+            openFormFromAButton(sender, new AddVariabelsAndListsForm(myValues, null, false));
+        }
+
+        /*private void ShowLists_Click(object sender, EventArgs e)
+        {
+            updateLists();
+        }
+
+        bool listsOpend = false;
+        private void updateLists(bool showLists = false)
+        {
+            //show all the lists in a list
+            if (showLists)
+            {
+                //this thing is made when the user adds a list so it opens the list of the lists outomaticly
+                listsOpend = true;
+            }
+            else
+            {
+                listsOpend = !listsOpend;
+            }
+
+            Color color = Color.Red;
+
+            if (listsOpend)
+            {
+                //show the lists
+                for (int i = 0; i <= myValues.lists.Count - 1; i++)
+                {
+                    BlockCode listCode = new BlockCode(new List<CodePart>() { new CodePart(myValues.lists[i].Name, false, true) });
+                    BlockInfo listInfo = makeBlockInfo(new List<BlockInfoEvent>() { new BlockInfoEvent(myValues.lists[i].Name) }, listCode, color);
+                    addBlock(Block.BlockKinds.Value, listInfo);
+                }
+            }
+            else
+            {
+                //clear all the values
+                btnsPanel.Controls.Clear();
+
+                height = 20;
+
+                showVariabelButtons();
+            }
+        }
+        */
+
+        #endregion
+
+        #endregion
+
+        #region add func
+
+        private void AddFunc_Click(object sender, EventArgs e)
+        {
+            AddFuncForm form = new AddFuncForm(myValues, AddBlockInfo, showFuncsButtons);
+            openFormFromAButton(sender, form);
         }
         
         #endregion
 
         #endregion
+
+        #endregion
+
+        #endregion
+
+        #region create new block
+
+        private void CreateBlockBtn_Click(object sender, EventArgs e)
+        {
+            //open the correct form
+            //addBlockInfoToTheForm addB = new addBlockInfoToTheForm(form, ProgramingPanelLocation, AddBlock);
+            CreateNewBlockForm myForm = new CreateNewBlockForm(myValues, AddBlockInfo);
+            openFormFromAButton(sender, myForm);
+        }
 
         #endregion
 
@@ -361,17 +675,22 @@ namespace GuiScratch
             if (e.Button == MouseButtons.Left)
             {
                 PictureBox pb = (PictureBox)sender;
-
-                pb.Parent = form;
-                pb.BringToFront();
-                pb.BackColor = SystemColors.ControlDark;
-                lastPoint = e.Location;
+                addPBToForm(pb, e.Location);
 
                 //create the new block that will stay in the place of the last button
                 newBlock = new PictureBox();
                 setPictureBox(newBlock, pb.Location, BlocksImageCreator.drawBitmap(blockInfos[int.Parse(pb.Name)][0].Kind, getCloneInfoList(int.Parse(pb.Name)), newBlock, getBlockHeight(blockInfos[int.Parse(pb.Name)][0].Kind, blockInfos[int.Parse(pb.Name)].Count)));
                 newBlock.Name = pb.Name;
             }
+        }
+
+        private void addPBToForm(PictureBox pb, Point location)
+        {
+            pb.Parent = form;
+            pb.BringToFront();
+            pb.BackColor = SystemColors.ControlDark;
+
+            lastPoint = location;
         }
 
         private List<BlockInfo> getCloneInfoList(int index)

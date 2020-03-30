@@ -33,6 +33,10 @@ namespace GuiScratch
                     {
                         res += Values.getVarName(Parts[i].Text);
                     }
+                    else if (Parts[i].IsAUserVar)
+                    {
+                        res += Values.getUserVarName(Parts[i].Text);
+                    }
                     else
                     {
                         res += Parts[i].Text;
@@ -47,6 +51,14 @@ namespace GuiScratch
                     else if (Parts[i].RandVar)
                     {
                         res += varName;
+                    }
+                    else if (Parts[i].IsAUserVar)
+                    {
+                        res += Values.getUserVarName(info.BlockInfoEvents[Parts[i].Index].getText());
+                    }
+                    else if (Parts[i].IsAUserList)
+                    {
+                        res += Values.getUserListName(info.BlockInfoEvents[Parts[i].Index].getText());
                     }
                     else
                     {
@@ -116,20 +128,24 @@ namespace GuiScratch
             kind = Kinds.info;
         }
 
-        public CodePart(int index, bool isAName = false)
+        public CodePart(int index, bool isAName = false, bool isAUserVar = false, bool isAUserList = false)
         {
             Index = index;
             kind = Kinds.info;
 
             IsAName = isAName;
+            IsAUserVar = isAUserVar;
+            IsAUserList = isAUserList;
         }
 
-        public CodePart(string text, bool isAVar = false)
+        public CodePart(string text, bool isAVar = false, bool isAUserVar = false, bool isAUserList = false)
         {
             Text = text;
             kind = Kinds.info;
 
             IsAVar = isAVar;
+            IsAUserVar = isAUserVar;
+            IsAUserList = isAUserList;
         }
         public CodePart(string text)
         {
@@ -141,9 +157,9 @@ namespace GuiScratch
 
         public override string ToString()
         {
-            //returns kind randVar index isAName Text isAVar
+            //returns kind randVar index isAName Text isAVar isAUserVar
             string res = "\x0001" + ((int)kind).ToString()+ "\x0001"+RandVar.ToString()+"\x0001"+Index.ToString() + "\x0001"+
-                IsAName.ToString() + "\x0001"+Text+"\x0001"+IsAVar.ToString();
+                IsAName.ToString() + "\x0001"+Text+"\x0001"+IsAVar.ToString()+ "\x0001" + IsAUserVar.ToString();
 
             return res;
         }
@@ -160,6 +176,7 @@ namespace GuiScratch
             Text = vars[index++];
             IsAVar = BlockInfo.stringToBool(vars[index++]);
 
+            IsAUserVar = BlockInfo.stringToBool(vars[index++]);
         }
 
         #endregion
@@ -171,6 +188,8 @@ namespace GuiScratch
         
         public string Text;
         public bool IsAVar;
+        public bool IsAUserVar;
+        public bool IsAUserList;
 
         public enum Kinds { text, info}
         public Kinds kind;

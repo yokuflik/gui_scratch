@@ -67,6 +67,12 @@ namespace GuiScratch
                 res += "\n}";
             }
 
+            //add the client code
+            if (Client != null)
+            {
+                res += Client.getCode();
+            }
+
             return res;
         }
 
@@ -327,10 +333,10 @@ namespace GuiScratch
         }
         */
 
-        /*private void MouseUp(object sender, MouseEventArgs e)
+        private void MouseUp(object sender, MouseEventArgs e)
         {
             CheckClientsAndParents(this, infos[0].CanBeParent, true);
-        }*/
+        }
 
         public override void bringToFront()
         {

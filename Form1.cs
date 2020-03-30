@@ -430,9 +430,13 @@ namespace GuiScratch
             douplicateButton.Text = "Douplicate";
             douplicateButton.Click += DouplicateButton_Click;
 
-            if (!blocks[blocks.Count-1].Info.CanDeleteAndDouplicate)
+            if (!blocks[blocks.Count - 1].Info.CanDeleteAndDouplicate)
             {
                 deleteButton.Enabled = douplicateButton.Enabled = false;
+            }
+            else if (blocks[blocks.Count - 1].Info.Kind == Block.BlockKinds.OnStart)
+            {
+                douplicateButton.Enabled = false;
             }
 
             ToolStripButton addCommentButton = new ToolStripButton();
@@ -445,7 +449,7 @@ namespace GuiScratch
             douplicateButton,
             addCommentButton});
             cms.Size = new Size(102, 70);
-            
+
             blocks[blocks.Count - 1].cms = cms;
         }
 
@@ -993,6 +997,5 @@ namespace GuiScratch
         #endregion
 
         #endregion
-
     }
 }

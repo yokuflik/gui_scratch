@@ -45,6 +45,8 @@ namespace GuiScratch
 
         #endregion
 
+        #region clone and remove
+
         public virtual Block Clone(decimal newIndex)
         {
             //every kind of block returns the clone of his kind
@@ -56,6 +58,10 @@ namespace GuiScratch
             PB.Parent = null;
         }
 
+        #endregion
+
+        #region code
+
         public virtual string getCode()
         {
             string res = "\n"+Info.BlockCode.getCode(Info);
@@ -66,6 +72,8 @@ namespace GuiScratch
             }
             return res;
         }
+
+        #endregion
 
         #region move the block after duplicate
 
@@ -674,6 +682,5 @@ namespace GuiScratch
         public Action<Block, bool> BlockMoveFunc;
 
         #endregion
-
     }
 }
