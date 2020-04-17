@@ -44,5 +44,24 @@ namespace GuiScratch
         public BlockInfo Info;
 
         public string Name;
+        
+        #region to and from string
+
+        public override string ToString()
+        {
+            //Name Info
+            string res = "\x0001" + Name + Info.ToString(); // the info adds the start to itself
+            
+            return res;
+        }
+
+        public MyFunc(Values MyValues, string[] vars, ref int index)
+        {
+            Name = vars[index++];
+
+            Info = new BlockInfo(MyValues, vars, ref index);
+        }
+
+        #endregion
     }
 }

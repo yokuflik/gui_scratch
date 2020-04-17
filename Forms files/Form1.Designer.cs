@@ -40,11 +40,14 @@
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.runToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+            this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.undoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.redoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.addBlocksPanel = new System.Windows.Forms.Panel();
             this.screenPanel = new System.Windows.Forms.Panel();
             this.screenPB = new System.Windows.Forms.PictureBox();
+            this.addBlocksPanel = new System.Windows.Forms.Panel();
             this.tabPage2 = new System.Windows.Forms.TabPage();
             this.panel2 = new System.Windows.Forms.Panel();
             this.label4 = new System.Windows.Forms.Label();
@@ -56,6 +59,9 @@
             this.propertiesPanel = new System.Windows.Forms.Panel();
             this.label5 = new System.Windows.Forms.Label();
             this.tabPage3 = new System.Windows.Forms.TabPage();
+            this.advancedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.addNewBlockToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.updateTheFilesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.blocksContextMenu.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             this.tabControl1.SuspendLayout();
@@ -156,12 +162,39 @@
             // menuStrip1
             // 
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileToolStripMenuItem});
+            this.fileToolStripMenuItem,
+            this.editToolStripMenuItem,
+            this.advancedToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Size = new System.Drawing.Size(1370, 24);
             this.menuStrip1.TabIndex = 10;
             this.menuStrip1.Text = "menuStrip1";
+            // 
+            // editToolStripMenuItem
+            // 
+            this.editToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.undoToolStripMenuItem,
+            this.redoToolStripMenuItem});
+            this.editToolStripMenuItem.Name = "editToolStripMenuItem";
+            this.editToolStripMenuItem.Size = new System.Drawing.Size(39, 20);
+            this.editToolStripMenuItem.Text = "&Edit";
+            // 
+            // undoToolStripMenuItem
+            // 
+            this.undoToolStripMenuItem.Name = "undoToolStripMenuItem";
+            this.undoToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z)));
+            this.undoToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.undoToolStripMenuItem.Text = "&Undo";
+            this.undoToolStripMenuItem.Click += new System.EventHandler(this.undoToolStripMenuItem_Click);
+            // 
+            // redoToolStripMenuItem
+            // 
+            this.redoToolStripMenuItem.Name = "redoToolStripMenuItem";
+            this.redoToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.R)));
+            this.redoToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.redoToolStripMenuItem.Text = "&Redo";
+            this.redoToolStripMenuItem.Click += new System.EventHandler(this.redoToolStripMenuItem_Click);
             // 
             // tabControl1
             // 
@@ -180,8 +213,8 @@
             // 
             // tabPage1
             // 
-            this.tabPage1.Controls.Add(this.addBlocksPanel);
             this.tabPage1.Controls.Add(this.screenPanel);
+            this.tabPage1.Controls.Add(this.addBlocksPanel);
             this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
@@ -189,17 +222,6 @@
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Programing";
             this.tabPage1.UseVisualStyleBackColor = true;
-            // 
-            // addBlocksPanel
-            // 
-            this.addBlocksPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this.addBlocksPanel.AutoScroll = true;
-            this.addBlocksPanel.BackColor = System.Drawing.Color.LightGray;
-            this.addBlocksPanel.Location = new System.Drawing.Point(3, 3);
-            this.addBlocksPanel.Name = "addBlocksPanel";
-            this.addBlocksPanel.Size = new System.Drawing.Size(282, 571);
-            this.addBlocksPanel.TabIndex = 10;
             // 
             // screenPanel
             // 
@@ -211,9 +233,9 @@
             this.screenPanel.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.screenPanel.Controls.Add(this.screenPB);
             this.screenPanel.Controls.Add(this.runButton);
-            this.screenPanel.Location = new System.Drawing.Point(279, 3);
+            this.screenPanel.Location = new System.Drawing.Point(286, 3);
             this.screenPanel.Name = "screenPanel";
-            this.screenPanel.Size = new System.Drawing.Size(1080, 571);
+            this.screenPanel.Size = new System.Drawing.Size(1073, 571);
             this.screenPanel.TabIndex = 9;
             this.screenPanel.SizeChanged += new System.EventHandler(this.screenPanel_SizeChanged);
             // 
@@ -224,6 +246,17 @@
             this.screenPB.Size = new System.Drawing.Size(1080, 571);
             this.screenPB.TabIndex = 2;
             this.screenPB.TabStop = false;
+            // 
+            // addBlocksPanel
+            // 
+            this.addBlocksPanel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.addBlocksPanel.AutoScroll = true;
+            this.addBlocksPanel.BackColor = System.Drawing.Color.LightGray;
+            this.addBlocksPanel.Location = new System.Drawing.Point(3, 3);
+            this.addBlocksPanel.Name = "addBlocksPanel";
+            this.addBlocksPanel.Size = new System.Drawing.Size(283, 571);
+            this.addBlocksPanel.TabIndex = 10;
             // 
             // tabPage2
             // 
@@ -333,6 +366,31 @@
             this.tabPage3.Text = "Images";
             this.tabPage3.UseVisualStyleBackColor = true;
             // 
+            // advancedToolStripMenuItem
+            // 
+            this.advancedToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.addNewBlockToolStripMenuItem,
+            this.updateTheFilesToolStripMenuItem});
+            this.advancedToolStripMenuItem.Name = "advancedToolStripMenuItem";
+            this.advancedToolStripMenuItem.Size = new System.Drawing.Size(72, 20);
+            this.advancedToolStripMenuItem.Text = "&Advanced";
+            // 
+            // addNewBlockToolStripMenuItem
+            // 
+            this.addNewBlockToolStripMenuItem.Name = "addNewBlockToolStripMenuItem";
+            this.addNewBlockToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.A)));
+            this.addNewBlockToolStripMenuItem.Size = new System.Drawing.Size(198, 22);
+            this.addNewBlockToolStripMenuItem.Text = "&Add new block";
+            this.addNewBlockToolStripMenuItem.Click += new System.EventHandler(this.addNewBlockToolStripMenuItem_Click);
+            // 
+            // updateTheFilesToolStripMenuItem
+            // 
+            this.updateTheFilesToolStripMenuItem.Name = "updateTheFilesToolStripMenuItem";
+            this.updateTheFilesToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.U)));
+            this.updateTheFilesToolStripMenuItem.Size = new System.Drawing.Size(198, 22);
+            this.updateTheFilesToolStripMenuItem.Text = "&Update the files";
+            this.updateTheFilesToolStripMenuItem.Click += new System.EventHandler(this.updateTheFilesToolStripMenuItem_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -345,6 +403,7 @@
             this.Name = "Form1";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
+            this.Resize += new System.EventHandler(this.Form1_Resize);
             this.blocksContextMenu.ResumeLayout(false);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
@@ -392,6 +451,12 @@
         private System.Windows.Forms.TabPage tabPage3;
         private System.Windows.Forms.Panel screenPanel;
         private System.Windows.Forms.PictureBox screenPB;
+        private System.Windows.Forms.ToolStripMenuItem editToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem undoToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem redoToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem advancedToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem addNewBlockToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem updateTheFilesToolStripMenuItem;
     }
 }
 

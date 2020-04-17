@@ -29,10 +29,12 @@
         private void InitializeComponent()
         {
             this.cancelButton = new System.Windows.Forms.Button();
-            this.addButton = new System.Windows.Forms.Button();
             this.blockInfoPanel = new System.Windows.Forms.Panel();
             this.infoPB = new System.Windows.Forms.PictureBox();
+            this.removeInfoBtnsPanel = new System.Windows.Forms.Panel();
             this.panel1 = new System.Windows.Forms.Panel();
+            this.addComboBoxPanel = new System.Windows.Forms.Panel();
+            this.label8 = new System.Windows.Forms.Label();
             this.addCBOptionsPanel = new System.Windows.Forms.Panel();
             this.label3 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
@@ -44,7 +46,6 @@
             this.label1 = new System.Windows.Forms.Label();
             this.inputKindCB = new System.Windows.Forms.ComboBox();
             this.AddCodeButton = new System.Windows.Forms.Button();
-            this.removeInfoBtnsPanel = new System.Windows.Forms.Panel();
             this.label6 = new System.Windows.Forms.Label();
             this.blockKindCB = new System.Windows.Forms.ComboBox();
             this.valueKindPanel = new System.Windows.Forms.Panel();
@@ -53,6 +54,7 @@
             this.blockInfoPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.infoPB)).BeginInit();
             this.panel1.SuspendLayout();
+            this.addComboBoxPanel.SuspendLayout();
             this.addCBOptionsPanel.SuspendLayout();
             this.addTextPanel.SuspendLayout();
             this.addInputPanel.SuspendLayout();
@@ -62,24 +64,13 @@
             // cancelButton
             // 
             this.cancelButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.cancelButton.Location = new System.Drawing.Point(232, 298);
+            this.cancelButton.Location = new System.Drawing.Point(325, 298);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(75, 27);
             this.cancelButton.TabIndex = 11;
             this.cancelButton.Text = "Cancel";
             this.cancelButton.UseVisualStyleBackColor = true;
             this.cancelButton.Click += new System.EventHandler(this.cancelButton_Click);
-            // 
-            // addButton
-            // 
-            this.addButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.addButton.Location = new System.Drawing.Point(434, 298);
-            this.addButton.Name = "addButton";
-            this.addButton.Size = new System.Drawing.Size(75, 27);
-            this.addButton.TabIndex = 10;
-            this.addButton.Text = "Add";
-            this.addButton.UseVisualStyleBackColor = true;
-            this.addButton.MouseUp += new System.Windows.Forms.MouseEventHandler(this.addButton_MouseUp);
             // 
             // blockInfoPanel
             // 
@@ -100,9 +91,17 @@
             this.infoPB.TabIndex = 0;
             this.infoPB.TabStop = false;
             // 
+            // removeInfoBtnsPanel
+            // 
+            this.removeInfoBtnsPanel.AutoSize = true;
+            this.removeInfoBtnsPanel.Location = new System.Drawing.Point(1, 0);
+            this.removeInfoBtnsPanel.Name = "removeInfoBtnsPanel";
+            this.removeInfoBtnsPanel.Size = new System.Drawing.Size(453, 25);
+            this.removeInfoBtnsPanel.TabIndex = 15;
+            // 
             // panel1
             // 
-            this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel1.Controls.Add(this.addComboBoxPanel);
             this.panel1.Controls.Add(this.addCBOptionsPanel);
             this.panel1.Controls.Add(this.addTextPanel);
             this.panel1.Controls.Add(this.addInputPanel);
@@ -110,6 +109,25 @@
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(456, 136);
             this.panel1.TabIndex = 13;
+            // 
+            // addComboBoxPanel
+            // 
+            this.addComboBoxPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.addComboBoxPanel.Controls.Add(this.label8);
+            this.addComboBoxPanel.Location = new System.Drawing.Point(241, 3);
+            this.addComboBoxPanel.Name = "addComboBoxPanel";
+            this.addComboBoxPanel.Size = new System.Drawing.Size(210, 38);
+            this.addComboBoxPanel.TabIndex = 4;
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label8.Location = new System.Drawing.Point(5, 9);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(105, 17);
+            this.label8.TabIndex = 0;
+            this.label8.Text = "Add combo box";
             // 
             // addCBOptionsPanel
             // 
@@ -222,21 +240,13 @@
             // AddCodeButton
             // 
             this.AddCodeButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.AddCodeButton.Location = new System.Drawing.Point(326, 298);
+            this.AddCodeButton.Location = new System.Drawing.Point(419, 298);
             this.AddCodeButton.Name = "AddCodeButton";
             this.AddCodeButton.Size = new System.Drawing.Size(90, 27);
             this.AddCodeButton.TabIndex = 14;
             this.AddCodeButton.Text = "Add code";
             this.AddCodeButton.UseVisualStyleBackColor = true;
             this.AddCodeButton.Click += new System.EventHandler(this.AddCodeButton_Click);
-            // 
-            // removeInfoBtnsPanel
-            // 
-            this.removeInfoBtnsPanel.AutoSize = true;
-            this.removeInfoBtnsPanel.Location = new System.Drawing.Point(1, 0);
-            this.removeInfoBtnsPanel.Name = "removeInfoBtnsPanel";
-            this.removeInfoBtnsPanel.Size = new System.Drawing.Size(453, 25);
-            this.removeInfoBtnsPanel.TabIndex = 15;
             // 
             // label6
             // 
@@ -297,7 +307,6 @@
             this.Controls.Add(this.panel1);
             this.Controls.Add(this.blockInfoPanel);
             this.Controls.Add(this.cancelButton);
-            this.Controls.Add(this.addButton);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
             this.MinimizeBox = false;
@@ -310,6 +319,8 @@
             this.blockInfoPanel.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.infoPB)).EndInit();
             this.panel1.ResumeLayout(false);
+            this.addComboBoxPanel.ResumeLayout(false);
+            this.addComboBoxPanel.PerformLayout();
             this.addCBOptionsPanel.ResumeLayout(false);
             this.addCBOptionsPanel.PerformLayout();
             this.addTextPanel.ResumeLayout(false);
@@ -326,7 +337,6 @@
         #endregion
 
         private System.Windows.Forms.Button cancelButton;
-        private System.Windows.Forms.Button addButton;
         private System.Windows.Forms.Panel blockInfoPanel;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.ComboBox inputKindCB;
@@ -347,5 +357,7 @@
         private System.Windows.Forms.Panel valueKindPanel;
         private System.Windows.Forms.ComboBox valueKindCB;
         private System.Windows.Forms.Label label7;
+        private System.Windows.Forms.Panel addComboBoxPanel;
+        private System.Windows.Forms.Label label8;
     }
 }

@@ -46,7 +46,7 @@ namespace GuiScratch
                 {
                     if (Parts[i].IsAName)
                     {
-                        res += Values.getControlName(info.BlockInfoEvents[Parts[i].Index].getText());
+                        res += Values.getControlName(info.BlockInfoEvents[Parts[i].Index].getText(false));
                     }
                     else if (Parts[i].RandVar)
                     {
@@ -54,11 +54,11 @@ namespace GuiScratch
                     }
                     else if (Parts[i].IsAUserVar)
                     {
-                        res += Values.getUserVarName(info.BlockInfoEvents[Parts[i].Index].getText());
+                        res += Values.getUserVarName(info.BlockInfoEvents[Parts[i].Index].getText(false));
                     }
                     else if (Parts[i].IsAUserList)
                     {
-                        res += Values.getUserListName(info.BlockInfoEvents[Parts[i].Index].getText());
+                        res += Values.getUserListName(info.BlockInfoEvents[Parts[i].Index].getText(false));
                     }
                     else
                     {

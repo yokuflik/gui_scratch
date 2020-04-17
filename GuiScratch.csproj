@@ -47,30 +47,30 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AddCodeForUserBlock.cs">
+    <Compile Include="Forms files\AddCodeForUserBlock.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="AddCodeForUserBlock.Designer.cs">
+    <Compile Include="Forms files\AddCodeForUserBlock.Designer.cs">
       <DependentUpon>AddCodeForUserBlock.cs</DependentUpon>
     </Compile>
-    <Compile Include="AddFuncForm.cs">
+    <Compile Include="Forms files\AddFuncForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="AddFuncForm.Designer.cs">
+    <Compile Include="Forms files\AddFuncForm.Designer.cs">
       <DependentUpon>AddFuncForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Blocks files\addBlockInfoToForm.cs" />
-    <Compile Include="AddVariabelsForm.cs">
+    <Compile Include="Forms files\AddVariabelsForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="AddVariabelsForm.Designer.cs">
+    <Compile Include="Forms files\AddVariabelsForm.Designer.cs">
       <DependentUpon>AddVariabelsForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Blocks files\ActionBlock.cs" />
-    <Compile Include="AddEventFuncForm.cs">
+    <Compile Include="Forms files\AddEventFuncForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="AddEventFuncForm.Designer.cs">
+    <Compile Include="Forms files\AddEventFuncForm.Designer.cs">
       <DependentUpon>AddEventFuncForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Blocks files\Block.cs" />
@@ -79,51 +79,62 @@
     <Compile Include="Blocks files\BlockInfoKinds.cs" />
     <Compile Include="Blocks files\BlocksImageCreator.cs" />
     <Compile Include="Blocks files\BlocksToAdd.cs" />
+    <Compile Include="Blocks files\BTABlockInfo.cs" />
     <Compile Include="Blocks files\ContainBlock.cs" />
     <Compile Include="ControlsView.cs" />
-    <Compile Include="CreateNewBlockForm.cs">
+    <Compile Include="Forms files\CreateNewBlockForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="CreateNewBlockForm.Designer.cs">
+    <Compile Include="Forms files\CreateNewBlockForm.Designer.cs">
       <DependentUpon>CreateNewBlockForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Event.cs" />
     <Compile Include="FileSaveAndOpen.cs" />
-    <Compile Include="Form1.cs">
+    <Compile Include="Forms files\Form1.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.cs">
+    <Compile Include="Forms files\Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="Blocks files\GetCodeFromBlock.cs" />
-    <Compile Include="MyControl.cs" />
-    <Compile Include="MyFunc.cs" />
-    <Compile Include="MyList.cs" />
+    <Compile Include="Forms files\InputForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms files\InputForm.Designer.cs">
+      <DependentUpon>InputForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="My Values files\MyControl.cs" />
+    <Compile Include="My Values files\MyFunc.cs" />
+    <Compile Include="My Values files\MyList.cs" />
     <Compile Include="myProperties.cs" />
     <Compile Include="Blocks files\OnStartBlock.cs" />
-    <Compile Include="MyVars.cs" />
+    <Compile Include="My Values files\MyVars.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Blocks files\ValueBlock.cs" />
     <Compile Include="Run.cs" />
-    <Compile Include="Values.cs" />
-    <EmbeddedResource Include="AddCodeForUserBlock.resx">
+    <Compile Include="UndoInfo.cs" />
+    <Compile Include="My Values files\Values.cs" />
+    <EmbeddedResource Include="Forms files\AddCodeForUserBlock.resx">
       <DependentUpon>AddCodeForUserBlock.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="AddEventFuncForm.resx">
+    <EmbeddedResource Include="Forms files\AddEventFuncForm.resx">
       <DependentUpon>AddEventFuncForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="AddFuncForm.resx">
+    <EmbeddedResource Include="Forms files\AddFuncForm.resx">
       <DependentUpon>AddFuncForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="AddVariabelsForm.resx">
+    <EmbeddedResource Include="Forms files\AddVariabelsForm.resx">
       <DependentUpon>AddVariabelsForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="CreateNewBlockForm.resx">
+    <EmbeddedResource Include="Forms files\CreateNewBlockForm.resx">
       <DependentUpon>CreateNewBlockForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Form1.resx">
+    <EmbeddedResource Include="Forms files\Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms files\InputForm.resx">
+      <DependentUpon>InputForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

@@ -38,6 +38,8 @@ namespace GuiScratch
             bottomPB.Parent = null;
         }
 
+        #region mouse move and down funcs
+
         public override void AddMouseMoveAndDownFuncsToPB(MouseEventHandler mouseDownFunc, MouseEventHandler mouseMoveFunc)
         {
             startMovingPB();
@@ -51,6 +53,8 @@ namespace GuiScratch
             topPBs[0].MouseDown -= mouseDownFunc;
             topPBs[0].MouseMove -= mouseMoveFunc;
         }
+
+        #endregion
 
         public override string getCode()
         {
@@ -280,7 +284,7 @@ namespace GuiScratch
             {
                 //topPB and info
                 drawPBToBmp(ref bmp, topPBs[i], loc);
-                infos[i].drawImageToBmp(ref bmp, ref loc, ref g);
+                //infos[i].drawImageToBmp(ref bmp, ref loc, ref g);
                 loc.Y += topPBs[i].Height - 5;
 
                 //draw inside client
@@ -649,7 +653,9 @@ namespace GuiScratch
         }
 
         #endregion
-        
+
+        #region vars
+
         public List<BlockInfo> infos;
 
         public List<PictureBox> topPBs;
@@ -661,5 +667,6 @@ namespace GuiScratch
 
         public List<Block> insideClients;
 
+        #endregion
     }
 }

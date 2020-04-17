@@ -126,11 +126,6 @@ namespace GuiScratch
 
         public void startMovingPB()
         {
-            if (BlockMoveFunc != null)
-            {
-                BlockMoveFunc(this, true);
-            }
-
             //get the image
             Size bmpSize = new Size();
             getImageSize(ref bmpSize);
@@ -150,6 +145,12 @@ namespace GuiScratch
             movingPB.BackColor = Color.Transparent;
             movingPB.MouseMove += PB_MouseMove;
             movingPB.MouseUp += PB_MouseUp;
+
+            //draw all the other blocks to the screenPB
+            if (BlockMoveFunc != null)
+            {
+                BlockMoveFunc(this, true);
+            }
             
             //show the moving pb
             movingPB.Parent = Container;
@@ -201,7 +202,7 @@ namespace GuiScratch
         {
             drawPBToBmp(ref bmp, PB, loc);
 
-            Info.drawImageToBmp(ref bmp, ref loc, ref g);
+            //Info.drawImageToBmp(ref bmp, ref loc, ref g);
 
             loc.Y += PB.Height;
             if (isAParent() && drawClients)
@@ -246,11 +247,8 @@ namespace GuiScratch
 
         public void PB_MouseMove(object sender, MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Left)
+            if (e.Button == MouseButtons.Left && movingPB != null)
             {
-                //setLocation(PB.Left + (e.X - lastPoint.X), PB.Top + (e.Y - lastPoint.Y));
-                /*movingPB.Left += e.X - lastPoint.X;
-                movingPB.Top += e.Y - lastPoint.Y;*/
                 movingPB.Location = new Point(movingPB.Left + e.X - lastPoint.X, movingPB.Top + e.Y - lastPoint.Y);
 
                 lastPoint = e.Location;
@@ -286,7 +284,7 @@ namespace GuiScratch
 
         public void PB_MouseUp(object sender, MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Left)
+            if (e.Button == MouseButtons.Left && movingPB != null)
             {
                 //set the blocks
                 setLocation(movingPB.Left, movingPB.Top);

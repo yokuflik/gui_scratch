@@ -45,6 +45,8 @@
             this.removeCodeItemPanel = new System.Windows.Forms.Panel();
             this.label3 = new System.Windows.Forms.Label();
             this.blockNameTB = new System.Windows.Forms.TextBox();
+            this.backToAddInfoBtn = new System.Windows.Forms.Button();
+            this.clearCodePartsBtn = new System.Windows.Forms.Button();
             this.blockInfoPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.infoPB)).BeginInit();
             this.panel2.SuspendLayout();
@@ -57,7 +59,7 @@
             // getCodeButton
             // 
             this.getCodeButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.getCodeButton.Location = new System.Drawing.Point(344, 296);
+            this.getCodeButton.Location = new System.Drawing.Point(357, 296);
             this.getCodeButton.Name = "getCodeButton";
             this.getCodeButton.Size = new System.Drawing.Size(75, 27);
             this.getCodeButton.TabIndex = 13;
@@ -79,7 +81,7 @@
             // cancelButton
             // 
             this.cancelButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.cancelButton.Location = new System.Drawing.Point(250, 296);
+            this.cancelButton.Location = new System.Drawing.Point(141, 296);
             this.cancelButton.Name = "cancelButton";
             this.cancelButton.Size = new System.Drawing.Size(75, 27);
             this.cancelButton.TabIndex = 14;
@@ -90,15 +92,15 @@
             // blockInfoPanel
             // 
             this.blockInfoPanel.AutoScroll = true;
-            this.blockInfoPanel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.blockInfoPanel.Controls.Add(this.infoPB);
-            this.blockInfoPanel.Location = new System.Drawing.Point(12, 12);
+            this.blockInfoPanel.Location = new System.Drawing.Point(12, 24);
             this.blockInfoPanel.Name = "blockInfoPanel";
-            this.blockInfoPanel.Size = new System.Drawing.Size(501, 48);
+            this.blockInfoPanel.Size = new System.Drawing.Size(501, 36);
             this.blockInfoPanel.TabIndex = 15;
             // 
             // infoPB
             // 
+            this.infoPB.BackColor = System.Drawing.SystemColors.Control;
             this.infoPB.Location = new System.Drawing.Point(3, 3);
             this.infoPB.Name = "infoPB";
             this.infoPB.Size = new System.Drawing.Size(329, 40);
@@ -118,7 +120,6 @@
             // 
             // panel2
             // 
-            this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.panel2.Controls.Add(this.addInfoIndexPanel);
             this.panel2.Controls.Add(this.addTextPanel);
             this.panel2.Location = new System.Drawing.Point(12, 154);
@@ -178,7 +179,7 @@
             this.codeViewPanel.AutoSize = true;
             this.codeViewPanel.Location = new System.Drawing.Point(0, 43);
             this.codeViewPanel.Name = "codeViewPanel";
-            this.codeViewPanel.Size = new System.Drawing.Size(444, 40);
+            this.codeViewPanel.Size = new System.Drawing.Size(363, 40);
             this.codeViewPanel.TabIndex = 19;
             // 
             // panel1
@@ -188,7 +189,7 @@
             this.panel1.Controls.Add(this.codeViewPanel);
             this.panel1.Location = new System.Drawing.Point(69, 66);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(444, 86);
+            this.panel1.Size = new System.Drawing.Size(363, 86);
             this.panel1.TabIndex = 20;
             // 
             // removeCodeItemPanel
@@ -196,7 +197,7 @@
             this.removeCodeItemPanel.AutoSize = true;
             this.removeCodeItemPanel.Location = new System.Drawing.Point(3, 3);
             this.removeCodeItemPanel.Name = "removeCodeItemPanel";
-            this.removeCodeItemPanel.Size = new System.Drawing.Size(441, 34);
+            this.removeCodeItemPanel.Size = new System.Drawing.Size(360, 34);
             this.removeCodeItemPanel.TabIndex = 20;
             // 
             // label3
@@ -217,11 +218,35 @@
             this.blockNameTB.Size = new System.Drawing.Size(160, 23);
             this.blockNameTB.TabIndex = 21;
             // 
+            // backToAddInfoBtn
+            // 
+            this.backToAddInfoBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.backToAddInfoBtn.Location = new System.Drawing.Point(222, 296);
+            this.backToAddInfoBtn.Name = "backToAddInfoBtn";
+            this.backToAddInfoBtn.Size = new System.Drawing.Size(129, 27);
+            this.backToAddInfoBtn.TabIndex = 22;
+            this.backToAddInfoBtn.Text = "Back to add info";
+            this.backToAddInfoBtn.UseVisualStyleBackColor = true;
+            this.backToAddInfoBtn.Click += new System.EventHandler(this.backToAddInfoBtn_Click);
+            // 
+            // clearCodePartsBtn
+            // 
+            this.clearCodePartsBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.clearCodePartsBtn.Location = new System.Drawing.Point(438, 116);
+            this.clearCodePartsBtn.Name = "clearCodePartsBtn";
+            this.clearCodePartsBtn.Size = new System.Drawing.Size(75, 27);
+            this.clearCodePartsBtn.TabIndex = 23;
+            this.clearCodePartsBtn.Text = "Clear";
+            this.clearCodePartsBtn.UseVisualStyleBackColor = true;
+            this.clearCodePartsBtn.Click += new System.EventHandler(this.clearCodePartsBtn_Click);
+            // 
             // AddCodeForUserBlock
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(525, 335);
+            this.Controls.Add(this.clearCodePartsBtn);
+            this.Controls.Add(this.backToAddInfoBtn);
             this.Controls.Add(this.blockNameTB);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.panel1);
@@ -273,5 +298,7 @@
         private System.Windows.Forms.Panel removeCodeItemPanel;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox blockNameTB;
+        private System.Windows.Forms.Button backToAddInfoBtn;
+        private System.Windows.Forms.Button clearCodePartsBtn;
     }
 }

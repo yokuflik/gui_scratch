@@ -30,10 +30,11 @@ namespace GuiScratch
 
             if (results.Errors.Count > 0)
             {
-                for (int i = 0; i <= results.Errors.Count - 1; i++)
+                /*for (int i = 0; i <= results.Errors.Count - 1; i++)
                 {
                     MessageBox.Show(results.Errors[i].Line.ToString() + ": " + results.Errors[i].ErrorText);
-                }
+                }*/
+                MessageBox.Show("The code has some bugs");
             }
             else
             {
@@ -328,14 +329,15 @@ namespace FormWithButton
             //vars
             for (int i = 0; i <= myValues.vars.Count - 1; i++)
             {
-                res += "string " + Values.getUserVarName(myValues.vars[i].Name) + " = \"\";";
+                res += "\nstring " + Values.getUserVarName(myValues.vars[i].Name) + " = \"\";";
             }
 
             //lists
             for (int i = 0; i <= myValues.lists.Count - 1; i++)
             {
-                res += "List<string> " + Values.getUserListName(myValues.lists[i].Name) + " = new List<string>();";
+                res += "\nList<string> " + Values.getUserListName(myValues.lists[i].Name) + " = new List<string>();";
             }
+            res += "\nRandom rnd = new Random();";
 
             return res;
         }

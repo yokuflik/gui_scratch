@@ -12,7 +12,7 @@ namespace GuiScratch
 {
     public partial class AddEventFuncForm : Form
     {
-        public AddEventFuncForm(Values myValues, addBlockInfoToTheForm addBlock)
+        public AddEventFuncForm(Values myValues, AddBlockInfoToTheForm addBlock)
         {
             InitializeComponent();
             //Location = startLocation;
@@ -23,7 +23,7 @@ namespace GuiScratch
         
         public Values MyValues;
 
-        addBlockInfoToTheForm AddBlock;
+        AddBlockInfoToTheForm AddBlock;
         
         private void AddEventFuncForm_Load(object sender, EventArgs e)
         {

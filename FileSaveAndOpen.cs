@@ -16,6 +16,7 @@ namespace GuiScratch
         */
 
         #region save
+
         public static string saveFile(decimal blockIndex, List<Block> blocks, Values myValues)
         {
             string file = "";
@@ -26,7 +27,7 @@ namespace GuiScratch
             //add the values
             file += "\n" + myValues.ToString();
 
-            //add the blocks length
+            //add the blocks count
             file += "\x0001\n"+blocks.Count;
 
             //add all the blocks to the file
@@ -51,6 +52,11 @@ namespace GuiScratch
 
         #region open
 
+        public static string[] getStringList(string text)
+        {
+            return text.Split(new char[] { '\x0001' });
+        }
+
         public static Values openFile(string filePath, ref decimal blockIndex, ref List<BlockFromString> blocks, Values myValues)
         {
             StreamReader sr = new StreamReader(filePath);
@@ -58,7 +64,7 @@ namespace GuiScratch
             sr.Close();
 
             //read the text
-            string[] vars = text.Split(new char[] { '\x0001' });
+            string[] vars = getStringList(text);
 
             blockIndex = decimal.Parse(vars[0]);
 

@@ -57,7 +57,12 @@ namespace GuiScratch
             clientIndex = int.Parse(vars[index++]);
         }
 
-        public Block ToBlock(Control container, Func<Block, bool,bool,bool> checkClientsAndParents, Action<Block> rightClick, Action<Block, bool> startMoving)
+        public Block ToBlock(Control container, Func<Block, bool, bool, bool> checkClientsAndParents, Action<Block> rightClick, Action<Block, bool> startMoving)
+        {
+            return ToBlock(container, checkClientsAndParents, rightClick, startMoving, BlockIndex);
+        }
+
+        public Block ToBlock(Control container, Func<Block, bool,bool,bool> checkClientsAndParents, Action<Block> rightClick, Action<Block, bool> startMoving, int BlockIndex)
         {
             switch (Info.Kind)
             {

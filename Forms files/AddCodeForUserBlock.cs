@@ -12,19 +12,22 @@ namespace GuiScratch
 {
     public partial class AddCodeForUserBlock : Form
     {
-        public AddCodeForUserBlock(BlockInfo info, addBlockInfoToTheForm addBlock)
+        public AddCodeForUserBlock(Values myValues, BlockInfo info, AddBlockInfoToTheForm addBlock)
         {
             InitializeComponent();
 
             //save the values
+            MyValues = myValues;
             Info = info;
             AddBlock = addBlock;
         }
 
+        Values MyValues;
+
         BlockInfo Info;
         BlockCode Code;
 
-        addBlockInfoToTheForm AddBlock;
+        AddBlockInfoToTheForm AddBlock;
 
         #region start
 
@@ -43,11 +46,20 @@ namespace GuiScratch
             //show the blockInfo
             infoPB.Image = BlocksImageCreator.drawBitmap(Info.Kind, Info, infoPB);
 
+            //make the infoPB image to contain all the controls images but not th real controls
+            Bitmap bmp = new Bitmap(infoPB.Width, infoPB.Height);
+            infoPB.DrawToBitmap(bmp, new Rectangle(new Point(), infoPB.Size));
+            infoPB.Image = bmp;
+            infoPB.Controls.Clear();
+
+            //add to the info pb a when click func so it will add a info
+            infoPB.MouseDown += InfoPB_MouseDown;
+
             //set the add panels clicks
             setAddInfoButtonClick(addTextPanel, addText_Click);
             setAddInfoButtonClick(addInfoIndexPanel, addInfoIndex_Click);
         }
-
+        
         #endregion
 
         #region remove info
@@ -111,12 +123,22 @@ namespace GuiScratch
 
             //update the view
             updateView();
+
+            //select the last block
+            RichTextBox rtb = codeViewPanel.Controls[codeViewPanel.Controls.Count - 1] as RichTextBox;
+            rtb.Select();
         }
 
         private void addInfoIndex_Click(object sender, EventArgs e)
         {
             //check what kind of info it is
             int index = (int)addInfoIndexNUD.Value;
+
+            addInfoIndex(index);
+        }
+        
+        private void addInfoIndex(int index)
+        {
             BlockInfoEvent b = Info.BlockInfoEvents[index];
 
             CodePart p = new CodePart(index);
@@ -146,6 +168,26 @@ namespace GuiScratch
             updateView();
         }
 
+        private void InfoPB_MouseDown(object sender, MouseEventArgs e)
+        {
+            //check on witch info the ser clicked
+            int x = 0;
+            for (int i = 0; i <= Info.BlockInfoEvents.Count - 1; i++)
+            {
+                x += Info.BlockInfoEvents[i].getWidth();
+
+                //check if the click was is the last block info event
+                if (e.Location.X < x)
+                {
+                    if (Info.BlockInfoEvents[i].Kind != BlockInfoEvent.Kinds.text)
+                    {
+                        addInfoIndex(i);
+                    }
+                    return;
+                }
+            }
+        }
+        
         #endregion
 
         #region code view
@@ -238,7 +280,13 @@ namespace GuiScratch
 
         #endregion
 
-        #region bottom buttons
+        #region buttons
+
+        private void clearCodePartsBtn_Click(object sender, EventArgs e)
+        {
+            Code.Parts.Clear();
+            updateView();
+        }
 
         private void addButton_MouseUp(object sender, MouseEventArgs e)
         {
@@ -355,6 +403,21 @@ namespace GuiScratch
                             res += ", true";
                         }
                     }
+                    else //if is a regular combo box
+                    {
+                        res += "new string[] {";
+                        for (int i = 0; i <= b.comboBox.Items.Count-1; i++)
+                        {
+                            res += b.comboBox.Items[i].ToString();
+
+                            if (i != b.comboBox.Items.Count - 1)
+                            {
+                                res += ", ";
+                            }
+                        }
+
+                        res += "}";
+                    }
                     break;
                 case BlockInfoEvent.Kinds.numberInput:
                     res += "(decimal)" + b.getText();
@@ -385,6 +448,15 @@ namespace GuiScratch
         }
 
         #endregion
+
+        private void backToAddInfoBtn_Click(object sender, EventArgs e)
+        {
+            CreateNewBlockForm form = new CreateNewBlockForm(MyValues, AddBlock, Info);
+            form.Owner = this.Owner;
+            form.Show();
+
+            Close();
+        }
 
         private void cancelButton_Click(object sender, EventArgs e)
         {

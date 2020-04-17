@@ -12,7 +12,7 @@ namespace GuiScratch
 {
     public partial class AddFuncForm : Form
     {
-        public AddFuncForm(Values myValues, addBlockInfoToTheForm addBlock, Action updateViewFunc)
+        public AddFuncForm(Values myValues, AddBlockInfoToTheForm addBlock, Action updateViewFunc)
         {
             InitializeComponent();
 
@@ -25,7 +25,7 @@ namespace GuiScratch
         }
 
         Values MyValues;
-        addBlockInfoToTheForm AddBlock;
+        AddBlockInfoToTheForm AddBlock;
 
         Action UpdateViewFunc;
         
@@ -152,6 +152,11 @@ namespace GuiScratch
         
         private void addButton_MouseUp(object sender, MouseEventArgs e)
         {
+            if (!checkTheValueNames())
+            {
+                return;
+            }
+
             //set the info and code
             BlockInfo info = makeInfo();
             BlockCode code = makeCode(info);
@@ -164,6 +169,39 @@ namespace GuiScratch
             AddBlock.add(info, addButton.PointToScreen(e.Location));
 
             Close();
+        }
+
+        private bool checkTheValueNames()
+        {
+            //check all the func values names to see if they are lagel names
+            List<string> names = new List<string>();
+
+            for (int i = 1; i <= Info.BlockInfoEvents.Count - 1; i++)
+            {
+                if (Info.BlockInfoEvents[i].Kind != BlockInfoEvent.Kinds.text)
+                {
+                    string currentName = Info.BlockInfoEvents[i].getText(false);
+                    
+                    if (names.Contains(currentName)) //check if two vars names are the same
+                    {
+                        MessageBox.Show("You can't make two func variables in the same name");
+                        return false;
+                    }
+
+                    string reason = "";
+                    //check if the name contains unlegal chars
+                    if (!Values.checkIfTheNameIsGoodForVarOrList(ref reason, currentName))
+                    {
+                        MessageBox.Show(reason);
+                        return false;
+                    }
+
+                    //save the last var name in the list
+                    names.Add(currentName);
+                }
+            }
+
+            return true; //all the func vars are good
         }
 
         #region make code
@@ -187,7 +225,7 @@ namespace GuiScratch
             {
                 if (l[i].IsDragAble && l[i].Kind != BlockInfoEvent.Kinds.text)
                 {
-                    res += getVarCodeFromKind(l[i].Kind) + " "+funcVarStart + l[i].getText();
+                    res += getVarCodeFromKind(l[i].Kind) + " "+funcVarStart + l[i].getText(false);
                     if (i != l.Count - 1)
                     {
                         res += ", ";
@@ -231,7 +269,7 @@ namespace GuiScratch
                 }
                 else
                 {
-                    l.Add(new BlockInfoEvent(infoEvents[i].Kind, infoEvents[i].getText(), makeCodeForInfoEvent(infoEvents[i]), true));
+                    l.Add(new BlockInfoEvent(infoEvents[i].Kind, infoEvents[i].getText(false), makeCodeForInfoEvent(infoEvents[i]), true));
                 }
             }
 
@@ -242,7 +280,7 @@ namespace GuiScratch
 
         private BlockCode makeCodeForInfoEvent(BlockInfoEvent b)
         {
-            CodePart p = new CodePart(funcVarStart + b.getText());
+            CodePart p = new CodePart(funcVarStart + b.getText(false));
             return new BlockCode(new List<CodePart>() { p });
         }
 
@@ -256,6 +294,5 @@ namespace GuiScratch
         }
 
         #endregion
-        
     }
 }

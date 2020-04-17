@@ -12,7 +12,7 @@ namespace GuiScratch
 {
     public partial class CreateNewBlockForm : Form
     {
-        public CreateNewBlockForm(Values myValues, addBlockInfoToTheForm addBlock)
+        public CreateNewBlockForm(Values myValues, AddBlockInfoToTheForm addBlock, BlockInfo info = null)
         {
             InitializeComponent();
 
@@ -20,15 +20,17 @@ namespace GuiScratch
             MyValues = myValues;
 
             AddBlock = addBlock;
+            
+            Info = info;
         }
         
         Values MyValues;
 
-        addBlockInfoToTheForm AddBlock;
+        AddBlockInfoToTheForm AddBlock;
 
         BlockInfo Info;
         List<BlockInfoEvent> infoEvents;
-
+        
         #region start
 
         private void CreateNewBlockForm_Load(object sender, EventArgs e)
@@ -58,18 +60,44 @@ namespace GuiScratch
         private void startCreate()
         {
             //set the info startup
-            infoEvents = new List<BlockInfoEvent>() { new BlockInfoEvent("Write text here", true) };
+            if (Info == null)
+            {
+                infoEvents = new List<BlockInfoEvent>() { new BlockInfoEvent("Write text here", true) };
+            }
+            else
+            {
+                infoEvents = Info.BlockInfoEvents;
+
+                //set all the text info to be in user create
+                for (int i = 0; i <= infoEvents.Count - 1; i++)
+                {
+                    if (infoEvents[i].Kind == BlockInfoEvent.Kinds.text)
+                    {
+                        infoEvents[i].IsInUserCreate = true;
+                    }
+                }
+
+                //set the selection
+                blockKindCB.SelectedIndex = (int)Info.Kind;
+                valueKindCB.SelectedIndex = (int)Info.ValueKind;
+            }
+
             Info = new BlockInfo(MyValues, infoEvents, Color.Purple, null);
-            Info.Kind = Block.BlockKinds.Action;
+            Info.Kind = (Block.BlockKinds)blockKindCB.SelectedIndex;
+            Info.ValueKind = (ValueBlock.ValueKinds)valueKindCB.SelectedIndex;
             updateTheBlock();
 
-            //select the first block event
-            infoEvents[0].CurrentC_Click(null, null);
-
+            if (infoEvents[0].Kind == BlockInfoEvent.Kinds.text) //only if the user started now to create the block select the first block event
+            {
+                //select the first block event
+                infoEvents[0].CurrentC_Click(null, null);
+            }
+            
             //set the add infos buttons
             setAddInfoButtonClick(addTextPanel, addText_Click);
             setAddInfoButtonClick(addInputPanel, addInput_Click);
             setAddInfoButtonClick(addCBOptionsPanel, addSelectionCB_Click);
+            setAddInfoButtonClick(addComboBoxPanel, addComboBox_Click);
         }
 
         #endregion
@@ -234,6 +262,14 @@ namespace GuiScratch
             updateAfterEditInfo();
         }
 
+        private void addComboBox_Click(object sender, EventArgs e)
+        {
+            infoEvents.Add(new BlockInfoEvent(new string[0], true));
+
+            //update the block view
+            updateAfterEditInfo();
+        }
+
         #endregion
 
         #region remove info
@@ -293,15 +329,9 @@ namespace GuiScratch
 
         #region bottom buttons
         
-        private void addButton_MouseUp(object sender, MouseEventArgs e)
-        {
-            AddBlock.add(Info.Clone(), addButton.PointToScreen(e.Location));
-            Close();
-        }
-        
         private void AddCodeButton_Click(object sender, EventArgs e)
         {
-            AddCodeForUserBlock addCode = new AddCodeForUserBlock(Info.Clone(), AddBlock);
+            AddCodeForUserBlock addCode = new AddCodeForUserBlock(MyValues, Info.Clone(), AddBlock);
 
             addCode.Owner = AddBlock.form;
             addCode.Show();
@@ -343,6 +373,5 @@ namespace GuiScratch
         }
 
         #endregion
-
     }
 }

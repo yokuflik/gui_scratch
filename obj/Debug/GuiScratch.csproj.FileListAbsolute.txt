@@ -13,3 +13,4 @@ D:\Yoel\C#\GuiScratch\GuiScratch\obj\Debug\GuiScratch.AddVariabelsAndListsForm.r
 D:\Yoel\C#\GuiScratch\GuiScratch\obj\Debug\GuiScratch.CreateNewBlockForm.resources
 D:\Yoel\C#\GuiScratch\GuiScratch\obj\Debug\GuiScratch.AddCodeForUserBlock.resources
 D:\Yoel\C#\GuiScratch\GuiScratch\obj\Debug\GuiScratch.AddFuncForm.resources
+D:\Yoel\C#\GuiScratch\GuiScratch\obj\Debug\GuiScratch.InputForm.resources

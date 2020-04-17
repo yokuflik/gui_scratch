@@ -25,10 +25,10 @@ namespace GuiScratch
 
         public override string ToString()
         {
-            //returns eventsCount events controlsCount controls varsCount vars
+            //returns userEventCount eventsCount events controlsCount controls varsCount vars
 
             //events
-            string res = "\x0001"+events.Count.ToString();
+            string res = "\x0001"+userEventCount.ToString()+ "\x0001" + events.Count.ToString();
 
             for (int i = 0; i <= events.Count - 1; i++)
             {
@@ -58,6 +58,14 @@ namespace GuiScratch
             {
                 res += lists[i].ToString();
             }
+            
+            //funcs
+            res += "\x0001" + funcs.Count.ToString();
+
+            for (int i = 0; i <= funcs.Count - 1; i++)
+            {
+                res += funcs[i].ToString();
+            }
 
             return res;
         }
@@ -65,6 +73,7 @@ namespace GuiScratch
         public Values(string[] vars, ref int index)
         {
             //set the events
+            userEventCount = int.Parse(vars[index++]);
             int eventsCount = int.Parse(vars[index++]);
             events = new List<Event>();
 
@@ -91,13 +100,22 @@ namespace GuiScratch
                 this.vars.Add(new MyVar(vars, ref index));
             }
 
-            //set the vars
+            //set the lists
             int listsCount = int.Parse(vars[index++]);
             lists = new List<MyList>();
 
             for (int i = 0; i <= listsCount - 1; i++)
             {
                 lists.Add(new MyList(vars, ref index));
+            }
+
+            //set the funcs
+            int funcsCount = int.Parse(vars[index++]);
+            funcs = new List<MyFunc>();
+
+            for (int i = 0; i <= funcsCount - 1; i++)
+            {
+                funcs.Add(new MyFunc(this, vars, ref index));
             }
         }
         
@@ -107,7 +125,7 @@ namespace GuiScratch
 
         #region user adds
 
-        private void callUpdate()
+        public void callUpdate()
         {
             if (updateBlocksFunc != null)
             {

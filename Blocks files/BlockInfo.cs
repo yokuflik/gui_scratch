@@ -174,14 +174,14 @@ namespace GuiScratch
 
         #region draw to bmp
 
-        public void drawImageToBmp(ref Bitmap bmp, ref Point loc, ref Graphics g)
+        /*public void drawImageToBmp(ref Bitmap bmp, ref Point loc, ref Graphics g)
         {
             Point myLoc = new Point(loc.X, loc.Y + drawHeight);
             for (int i = 0; i <= BlockInfoEvents.Count - 1; i++)
             {
                 BlockInfoEvents[i].drawImageToBmp(ref bmp, ref myLoc, ref g);
             }
-        }
+        }*/
 
         #endregion
 
@@ -253,11 +253,15 @@ namespace GuiScratch
 
         #region var func
 
-        public void setAddVarFunc(Action<BlockInfoEvent, Point> addVar)
+        public void setAddVarFunc(Action<BlockInfoEvent, Point> addVar, AddBlockInfoToTheForm addBlockInfo)
         {
             for (int i = 0; i <= BlockInfoEvents.Count - 1; i++)
             {
-                BlockInfoEvents[i].AddVar = addVar;
+                if (BlockInfoEvents[i].IsDragAble)
+                {
+                    BlockInfoEvents[i].AddVar = addVar;
+                    BlockInfoEvents[i].AddBlockInfo = addBlockInfo;
+                }
             }
         }
 
